@@ -1,0 +1,74 @@
+<misterromdescription>
+    <name>Pac-Man (Hearts)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Pac-Man</series>
+    <year>1981</year>
+    <manufacturer>hack</manufacturer>
+    <category>Maze</category>
+
+    <setname>pacheart</setname>
+    <parent>puckman</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>0</num_buttons>
+    <buttons names="Not Used,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,C9,00">
+        <dip name="Rack Test (Cheat)" bits="4" ids="Off,On" values="1,0"/>
+        <dip name="Service Mode" bits="12" ids="Off,On" values="1,0"/>
+        <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Coinage" bits="16,17" ids="2C/1C,1C/1C,1C/2C,Free Play" values="3,1,2,0"/>
+        <dip name="Lives" bits="18,19" ids="1,2,3,5"/>
+        <dip name="Bonus Life" bits="20,21" ids="10000,15000,20000,None"/>
+        <dip name="Difficulty" bits="22" ids="Normal,Hard" values="1,0"/>
+        <dip name="Ghost Names" bits="23" ids="Normal,Alternate" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14400 -->
+    <rom index="0" md5="none" zip="pacheart.zip|puckman.zip">
+        <part crc="d844b679" name="pacheart1.6e"/>
+        <part crc="b9152a38" name="pacheart.pg2"/>
+        <part crc="7d177853" name="pacheart2.6f"/>
+        <part crc="842d6574" name="pacheart.pg4"/>
+        <part crc="9045a44c" name="pacheart3.6h"/>
+        <part crc="888f3c3e" name="pacheart7.6n"/>
+        <part crc="f5265c10" name="pacheart.pg7"/>
+        <part crc="1a21a381" name="pacheart.pg8"/>
+        <part repeat="0xC000">00</part>
+        <part crc="c62bbabf" name="pacheart.ch1"/>
+        <part crc="3591b89d" name="chg2"/>
+        <part crc="ca8c184c" name="pacheart.ch3"/>
+        <part crc="1b1d9096" name="pacheart.ch4"/>
+        <part repeat="0x2000">00</part>
+        <part crc="2fc650bd" name="82s123.7f"/>
+        <part crc="3eb3a8e4" name="82s126.4a"/>
+        <part repeat="0x2E0">00</part>
+        <part crc="a9cc86bf" name="82s126.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            00 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 00 11 12 16 09 0B 0C 0A 00 13 14 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <remark>Pac-Man (Hearts) (Hack)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

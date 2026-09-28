@@ -1,0 +1,74 @@
+<misterromdescription>
+    <name>Newpuc2 (Set 1)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Pac-Man</series>
+    <year>1980</year>
+    <manufacturer>hack</manufacturer>
+    <category>Maze</category>
+
+    <setname>newpuc2</setname>
+    <parent>puckman</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>0</num_buttons>
+    <buttons names="Not Used,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,C9,00">
+        <dip name="Rack Test (Cheat)" bits="4" ids="Off,On" values="1,0"/>
+        <dip name="Service Mode" bits="12" ids="Off,On" values="1,0"/>
+        <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Coinage" bits="16,17" ids="2C/1C,1C/1C,1C/2C,Free Play" values="3,1,2,0"/>
+        <dip name="Lives" bits="18,19" ids="1,2,3,5"/>
+        <dip name="Difficulty" bits="22" ids="Normal,Hard" values="1,0"/>
+        <dip name="Ghost Names" bits="23" ids="Normal,Alternate" values="1,0"/>
+        <dip name="Bonus Life" bits="20,21" ids="20000,25000,30000" values="0,1,2"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14400 -->
+    <rom index="0" md5="none" zip="newpuc2.zip|puckman.zip">
+        <part crc="69496a98" name="6e.cpu"/>
+        <part crc="158fc01c" name="6k.cpu"/>
+        <part crc="7d177853" name="6f.cpu"/>
+        <part crc="70810ccf" name="6m.cpu"/>
+        <part crc="81719de8" name="6h.cpu"/>
+        <part crc="3f250c58" name="6n.cpu"/>
+        <part crc="e6675736" name="6j.cpu"/>
+        <part crc="1f81e765" name="6p.cpu"/>
+        <part repeat="0xC000">00</part>
+        <part crc="2066a0b7" name="5e.cpu"/>
+        <part crc="777c70d3" name="5h.cpu"/>
+        <part crc="ca8c184c" name="5f.cpu"/>
+        <part crc="7dc75a81" name="5j.cpu"/>
+        <part repeat="0x2000">00</part>
+        <part crc="2fc650bd" name="82s123.7f"/>
+        <part crc="3eb3a8e4" name="82s126.4a"/>
+        <part repeat="0x2E0">00</part>
+        <part crc="a9cc86bf" name="82s126.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            00 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 00 11 12 16 09 0B 0C 0A 00 13 14 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <remark>Newpuc2 (Set 1) (Hack)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>
