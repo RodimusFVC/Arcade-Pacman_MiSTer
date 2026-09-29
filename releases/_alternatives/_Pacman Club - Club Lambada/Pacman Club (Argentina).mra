@@ -1,0 +1,79 @@
+<misterromdescription>
+    <name>Pacman Club (Argentina)</name>
+    <region>Argentina</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Pacman Club / Club Lambada</series>
+    <year>1990</year>
+    <manufacturer>hack (Miky SRL)</manufacturer>
+    <category>Maze</category>
+
+    <setname>clubpacma</setname>
+    <parent>clubpacm</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>0</num_buttons>
+    <buttons names="Not Used,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,C9,FF">
+        <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Coinage" bits="16,17" ids="2C/1C,1C/1C,1C/2C,Free Play (Invalid)" values="3,1,2,0"/>
+        <dip name="Lives" bits="18" ids="3,5"/>
+        <dip name="Service Mode" bits="19" ids="Off,On" values="1,0"/>
+        <dip name="Bonus Life" bits="20,21" ids="40000,60000,80000,None"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="clubpacma.zip|clubpacm.zip">
+        <part crc="6d79d3f2" name="new_club.bin" offset="0x0" length="0x4000"/>
+        <part repeat="0x4000">00</part>
+        <part crc="6d79d3f2" name="new_club.bin" offset="0x4000" length="0x4000"/>
+        <part repeat="0x4000">00</part>
+        <part crc="93933d1d" name="12.5e"/>
+        <part crc="7409fbec" name="14.5h"/>
+        <part crc="22b0188a" name="13.5f"/>
+        <part crc="50c7477d" name="15.5j"/>
+        <part repeat="0x2000">00</part>
+        <part crc="2fc650bd" name="n82s123n.7f"/>
+        <part crc="3eb3a8e4" name="m7611.4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="m7611.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            11 91 08 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 00 11 12 16 09 0B 0C 0A 16 13 14 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <rom index="3" md5="none">
+        <part>
+            1A 01 51 39 00 FF 00 02 00 02 00 01 11 11 00 00
+            00 00 4E 88 00 04 00 00
+            00 00 43 ED 00 06 40 40
+            00 00 43 D1 00 01 59 59
+            00 00 43 CB 00 0A 4F 4D
+        </part>
+    </rom>
+    <rom index="4"></rom>
+    <nvram index="4" size="21"></nvram>
+
+    <remark>Pacman Club (Argentina) (Hack (Miky SRL))</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

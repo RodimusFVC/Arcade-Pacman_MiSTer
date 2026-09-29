@@ -1,0 +1,75 @@
+<misterromdescription>
+    <name>Boardwalk Casino</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Boardwalk Casino</series>
+    <year>1983</year>
+    <manufacturer>Epos Corporation</manufacturer>
+    <category>Maze</category>
+
+    <setname>bwcasino</setname>
+    <parent>bwcasino</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>8-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>6</num_buttons>
+    <buttons names="Fire,Button 2,Button 3,Button 4,Coin,Start 1P,Start 2P,Pause,Button 5,Button 6,Not Used" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,DF,00">
+        <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Unknown" bits="16" ids="Off,On" values="1,0"/>
+        <dip name="Hands per Game" bits="17,20" ids="3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18" values="15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0"/>
+        <dip name="Demo Sounds" bits="21" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="22" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="23" ids="Off,On" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="bwcasino.zip">
+        <part crc="e2eea868" name="u_2_boardwalk_casino_pp09144.u2"/>
+        <part crc="a935571e" name="u_3_boardwalk_casino_pp09144.u3"/>
+        <part repeat="0xC000">00</part>
+        <part crc="e334c01e" name="5_e_boardwalk_casino_pp09144.5e" offset="0x0" length="0x1000"/>
+        <part crc="e334c01e" name="5_e_boardwalk_casino_pp09144.5e" offset="0x0" length="0x1000"/>
+        <part repeat="0x2000">00</part>
+        <part crc="133bb744" name="7_f_b.w.c.7f"/>
+        <part crc="8e29208f" name="4_a_b.w.c.4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="82s126.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            0C 90 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            05 06 07 08 16 11 00 23 0D 0E 0F 10 22 20 21 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <rom index="3" md5="none">
+        <part>
+            01 1C 9B 44 00 FF 00 02 00 02 00 01 11 11 00 00
+            00 00 4C 3C 00 D2 00 00
+            00 00 4C CE 00 01 43 43
+        </part>
+    </rom>
+    <rom index="4"></rom>
+    <nvram index="4" size="211"></nvram>
+
+    <remark>Boardwalk Casino (Epos Corporation)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

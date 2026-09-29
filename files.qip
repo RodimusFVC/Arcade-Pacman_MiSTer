@@ -4,11 +4,22 @@ set_global_assignment -name SYSTEMVERILOG_FILE Arcade-Pacman.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/pacman_board.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/pacman_video.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/pacman_wsg.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/sound/schick_sound.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/cpu/segacrypt/sega_315_5010.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/cpu/segacrypt/sega_315_5007.sv
 
 set_global_assignment -name QIP_FILE rtl/cpu/T80/T80.qip
+set_global_assignment -name VHDL_FILE rtl/cpu/s2650/base/base_pack.vhd
+set_global_assignment -name VHDL_FILE rtl/cpu/s2650/sgs2650_pack.vhd
+set_global_assignment -name VHDL_FILE rtl/cpu/s2650/sgs2650.vhd
+set_global_assignment -name VHDL_FILE rtl/cpu/s2650/s2650_cpu.vhd
+set_global_assignment -name QIP_FILE rtl/sound/v_sound.qip
+set_global_assignment -name QIP_FILE rtl/sound/jt89/syn/quartus/jt89_verilog.qip
 
 set_global_assignment -name VERILOG_FILE rtl/mister_custom/pause.v
 set_global_assignment -name VERILOG_FILE rtl/mister_custom/hiscore.v
 
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/rom_loader.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/pacman_sdrom.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/sdram.sv
 set_global_assignment -name VHDL_FILE rtl/ram_rom/dpram_dc.vhd

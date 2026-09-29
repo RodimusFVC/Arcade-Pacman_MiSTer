@@ -1,0 +1,78 @@
+<misterromdescription>
+    <name>Crush Roller (Bootleg, Set 3)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>yes</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Crush Roller</series>
+    <year>1981</year>
+    <manufacturer>bootleg</manufacturer>
+    <category>Maze</category>
+
+    <setname>crushbl3</setname>
+    <parent>crush</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>0</num_buttons>
+    <buttons names="Not Used,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="EF,6F,39,00">
+        <dip name="Cabinet" bits="4" ids="Upright,Cocktail"/>
+        <dip name="Coinage" bits="16,17" ids="2C/1C,1C/1C,1C/2C,Free Play" values="3,1,2,0"/>
+        <dip name="Unknown" bits="20" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="21" ids="Off,On" values="1,0"/>
+        <dip name="Lives" bits="18,19" ids="3,4,5,6"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="crushbl3.zip|crush.zip">
+        <part crc="e1ecc4da" name="cre.bin"/>
+        <part crc="b5193960" name="crf.bin"/>
+        <part crc="964b9f24" name="crg.bin"/>
+        <part crc="dfd2380e" name="crh.bin"/>
+        <part repeat="0xC000">00</part>
+        <part crc="c7617198" name="cr1.5e"/>
+        <part crc="c15b6967" name="cr3.5h"/>
+        <part crc="d5bc5cb8" name="cr2.5f"/>
+        <part crc="d35d1caf" name="cr4.5j"/>
+        <part repeat="0x2000">00</part>
+        <part crc="ff344446" name="74s288.8a"/>
+        <part crc="63efb927" name="2s140.4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="82s126.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            08 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 00 11 12 16 09 0B 0C 0A 00 13 14 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <rom index="3" md5="none">
+        <part>
+            11 98 35 0D 00 FF 00 02 00 02 00 01 11 11 00 00
+            00 00 43 D2 00 02 49 48
+            00 00 4C 80 00 03 00 00
+        </part>
+    </rom>
+    <rom index="4"></rom>
+    <nvram index="4" size="5"></nvram>
+
+    <remark>Crush Roller (Bootleg, Set 3)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

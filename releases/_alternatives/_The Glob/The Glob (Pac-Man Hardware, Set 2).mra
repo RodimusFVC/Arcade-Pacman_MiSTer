@@ -1,0 +1,72 @@
+<misterromdescription>
+    <name>The Glob (Pac-Man Hardware, Set 2)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>The Glob</series>
+    <year>1983</year>
+    <manufacturer>Epos Corporation</manufacturer>
+    <category>Maze</category>
+
+    <setname>theglobpa</setname>
+    <parent>suprglob</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>2</num_buttons>
+    <buttons names="Fire,Button 2,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,DF,00">
+        <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Lives" bits="16,17" ids="3,4,5,6" values="3,2,1,0"/>
+        <dip name="Difficulty" bits="18,20" ids="Easiest,Very Easy,Easy,Normal,Difficult,Very Difficult,Very Hard,Hardest" values="7,6,5,4,3,2,1,0"/>
+        <dip name="Demo Sounds" bits="21" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="22" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="23" ids="Off,On" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="theglobpa.zip|suprglob.zip">
+        <part crc="760f4764" name="1-2516.bin"/>
+        <part crc="7d556bc6" name="2-2516.bin"/>
+        <part crc="ca9dafca" name="3-2516.bin"/>
+        <part crc="fff64f47" name="4-2516.bin"/>
+        <part crc="3c352e0f" name="5-2716.bin"/>
+        <part crc="5a7ba8b0" name="6-2716.bin"/>
+        <part crc="09f6b061" name="7-2716.bin"/>
+        <part crc="192b6d61" name="8-2716.bin"/>
+        <part repeat="0xC000">00</part>
+        <part crc="36408c76" name="9-2716.bin"/>
+        <part crc="b8ba069c" name="11-2716.bin"/>
+        <part crc="e0478b4e" name="10-2716.bin"/>
+        <part crc="ffb30caf" name="12-2716.bin"/>
+        <part repeat="0x2000">00</part>
+        <part crc="1f617527" name="tbp18s030.8h"/>
+        <part crc="28faa769" name="82s129.4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="63s141.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            0B 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 00 11 00 0E 09 0B 0C 0A 0D 05 06 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <remark>The Glob (Pac-Man Hardware, Set 2) (Epos Corporation)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

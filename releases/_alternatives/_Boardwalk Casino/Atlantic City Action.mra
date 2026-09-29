@@ -1,0 +1,60 @@
+<misterromdescription>
+    <name>Atlantic City Action</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Boardwalk Casino</series>
+    <year>1983</year>
+    <manufacturer>Epos Corporation</manufacturer>
+    <category>Maze</category>
+
+    <setname>acitya</setname>
+    <parent>bwcasino</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>8-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>6</num_buttons>
+    <buttons names="Fire,Button 2,Button 3,Button 4,Coin,Start 1P,Start 2P,Pause,Button 5,Button 6,Not Used" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,FE,00">
+        <dip name="Demo Sounds" bits="16" ids="Off,On" values="1,0"/>
+        <dip name="Hands per Game" bits="17,20" ids="3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18" values="15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="acitya.zip|bwcasino.zip">
+        <part crc="261c2fdc" name="aca_u2.bin"/>
+        <part crc="05fab4ca" name="aca_u3.bin"/>
+        <part repeat="0xC000">00</part>
+        <part crc="7f2dd2c9" name="aca_5e.bin" offset="0x0" length="0x1000"/>
+        <part crc="7f2dd2c9" name="aca_5e.bin" offset="0x0" length="0x1000"/>
+        <part repeat="0x2000">00</part>
+        <part crc="133bb744" name="aca_7f.bin"/>
+        <part crc="8e29208f" name="aca_4a.bin"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="82s126.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            0C 90 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            05 06 07 08 16 11 00 00 00 00 00 00 16 20 21 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <remark>Atlantic City Action (Epos Corporation)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

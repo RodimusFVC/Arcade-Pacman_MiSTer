@@ -1,0 +1,91 @@
+<misterromdescription>
+    <name>Pengo (Marti Colls Bootleg On Pac-Man Hardware, Set 1)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>yes</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Pengo</series>
+    <year>1982</year>
+    <manufacturer>bootleg (Marti Colls)</manufacturer>
+    <category>Maze</category>
+
+    <setname>pengomc1</setname>
+    <parent>pengo</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>1</num_buttons>
+    <buttons names="Fire,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Rack Test" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,BC,FF">
+        <dip name="Bonus Life" bits="16" ids="50000,30000" values="1,0"/>
+        <dip name="Lives" bits="17,18" ids="2,3,4,5" values="3,2,1,0"/>
+        <dip name="Coinage" bits="19,20" ids="3C/1C,2C/1C,1C/1C,1C/2C" values="1,2,3,0"/>
+        <dip name="Unknown" bits="21" ids="Off,On" values="1,0"/>
+        <dip name="Demo Sounds" bits="22" ids="Off,On" values="1,0"/>
+        <dip name="Rack Test (Cheat)" bits="23" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="24" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="25" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="26" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="27" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="28" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="29" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="30" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="31" ids="Off,On" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="pengomc1.zip|pengo.zip">
+        <part crc="dfe9640e" name="pengomc_02.a4" offset="0x0" length="0x200"/>
+        <part crc="ea415ede" name="pengomc_01.a5" offset="0x200" length="0xE00"/>
+        <part repeat="0x3000">00</part>
+        <part crc="ea415ede" name="pengomc_01.a5" offset="0x0" length="0x200"/>
+        <part crc="dfe9640e" name="pengomc_02.a4" offset="0x200" length="0xE00"/>
+        <part crc="0ac08ae4" name="pengomc_03.a3"/>
+        <part crc="1717a7d9" name="pengomc_04.a2"/>
+        <part crc="cb6eb19c" name="pengomc_05.a1"/>
+        <part repeat="0x8000">00</part>
+        <part crc="ad88978a" name="pengomc_09.e6"/>
+        <part crc="cb208b9f" name="pengomc_11.h6"/>
+        <part crc="bae319a3" name="pengomc_10.f6"/>
+        <part crc="5a5190e8" name="pengomc_12.k6"/>
+        <part repeat="0x2000">00</part>
+        <part crc="3a5844ec" name="82s123.8h"/>
+        <part crc="ef283be2" name="82s129.4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="3cb61034" name="82s129.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            10 91 07 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 00 11 12 05 09 0B 0C 0A 00 13 14 0D
+            00 00 00 00 00 00 00 25 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <rom index="3" md5="none">
+        <part>
+            00 18 BF 97 00 FF 00 02 00 02 00 01 11 11 00 00
+            00 00 88 40 00 1E D0 41
+            00 00 88 0C 00 02 D0 07
+        </part>
+    </rom>
+    <rom index="4"></rom>
+    <nvram index="4" size="32"></nvram>
+
+    <remark>Pengo (Marti Colls Bootleg On Pac-Man Hardware, Set 1)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

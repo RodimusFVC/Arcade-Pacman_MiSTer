@@ -25,7 +25,7 @@
     <joystick>4-way</joystick>
     <special_controls></special_controls>
     <num_buttons>1</num_buttons>
-    <buttons names="Fire,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause" default="A,Y,B,X,Select,Start,R,L"/>
+    <buttons names="Fire,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,Y,B,X,Select,Start,R,L"/>
 
     <switches default="FF,FF,FB,00">
         <dip name="Service Mode" bits="4" ids="Off,On" values="1,0"/>
@@ -36,7 +36,7 @@
         <dip name="Unknown" bits="23" ids="Off,On" values="1,0"/>
     </switches>
 
-    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14400 -->
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
     <rom index="0" md5="none" zip="eyeszacb.zip|eyes.zip">
         <part crc="a4a9d7a0" name="zacb_1.bin"/>
         <part crc="c32b3f73" name="zacb_5.bin"/>
@@ -54,7 +54,7 @@
         <part repeat="0x2000">00</part>
         <part crc="2fc650bd" name="82s123.7f"/>
         <part crc="d8d78829" name="82s129.4a"/>
-        <part repeat="0x2E0">00</part>
+        <part repeat="0x6E0">00</part>
         <part crc="a9cc86bf" name="82s126.1m"/>
     </rom>
 
@@ -66,6 +66,17 @@
             00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
         </part>
     </rom>
+
+    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <rom index="3" md5="none">
+        <part>
+            00 25 1F 62 00 FF 00 02 00 02 00 01 11 11 00 00
+            00 00 4C F7 00 3C 4C 00
+            00 00 43 ED 00 06 00 40
+        </part>
+    </rom>
+    <rom index="4"></rom>
+    <nvram index="4" size="66"></nvram>
 
     <remark>Eyes (Bootleg, Set 2, Decrypted)</remark>
     <mratimestamp>20260928000000</mratimestamp>

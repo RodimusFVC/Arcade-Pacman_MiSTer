@@ -1,0 +1,70 @@
+<misterromdescription>
+    <name>Jump Shot Engineering Sample</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Jump Shot</series>
+    <year>1985</year>
+    <manufacturer>Bally Midway</manufacturer>
+    <category>Maze</category>
+
+    <setname>jumpshotp</setname>
+    <parent>jumpshot</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>8-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>1</num_buttons>
+    <buttons names="Fire,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,DD,00">
+        <dip name="Unknown" bits="4" ids="Off,On" values="1,0"/>
+        <dip name="Service Mode" bits="12" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="15" ids="Off,On" values="1,0"/>
+        <dip name="Time Limit" bits="16,17" ids="Short,Average,Above Average" values="2,3,1"/>
+        <dip name="Unknown" bits="18" ids="Off,On" values="1,0"/>
+        <dip name="Players Skin Tone" bits="19" ids="Lighter,Darker" values="1,0"/>
+        <dip name="Free Play" bits="20" ids="Off,On" values="1,0"/>
+        <dip name="2 Players Game" bits="21" ids="1 Credit,2 Credits" values="1,0"/>
+        <dip name="Unknown" bits="22" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="23" ids="Off,On" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="jumpshotp.zip|jumpshot.zip">
+        <part crc="acc5e15e" name="js6e.bin"/>
+        <part crc="62b48ba4" name="js6f.bin"/>
+        <part crc="7c9b5e30" name="js6h.bin"/>
+        <part crc="9f0c39f6" name="js6j.bin"/>
+        <part repeat="0xC000">00</part>
+        <part crc="d9fa90f5" name="5e"/>
+        <part crc="2ec711c1" name="5f"/>
+        <part repeat="0x2000">00</part>
+        <part crc="872b42f3" name="prom.7f"/>
+        <part crc="0399f39f" name="prom.4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="82s126.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            00 90 03 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 00 11 12 16 09 0B 0C 0A 00 05 0D 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <remark>Jump Shot Engineering Sample (Bally Midway)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

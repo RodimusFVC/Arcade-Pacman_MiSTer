@@ -1,0 +1,67 @@
+<misterromdescription>
+    <name>Shoot The Bull</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Shoot The Bull</series>
+    <year>1985</year>
+    <manufacturer>Bally Midway</manufacturer>
+    <category>Maze</category>
+
+    <setname>shootbul</setname>
+    <parent>shootbul</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>8-way</joystick>
+    <special_controls>trackball</special_controls>
+    <num_buttons>1</num_buttons>
+    <buttons names="Fire,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="F0,F0,FF,00">
+        <dip name="Service Mode" bits="12" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="15" ids="Off,On" values="1,0"/>
+        <dip name="Time" bits="16,18" ids="Short,Average,Long,Longer,Longest" values="1,7,3,5,6"/>
+        <dip name="Title Page Sounds" bits="19" ids="Off,On"/>
+        <dip name="Unknown" bits="20" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="21" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="22" ids="Off,On" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="shootbul.zip">
+        <part crc="25daa5e9" name="sb6e.cpu"/>
+        <part crc="92144044" name="sb6f.cpu"/>
+        <part crc="43b7f99d" name="sb6h.cpu"/>
+        <part crc="bc4d3bbf" name="sb6j.cpu"/>
+        <part repeat="0xC000">00</part>
+        <part crc="07c6c5aa" name="sb5e.cpu"/>
+        <part crc="eaec6837" name="sb5f.cpu"/>
+        <part repeat="0x2000">00</part>
+        <part crc="ec578b98" name="7f.rom"/>
+        <part crc="81a6b30f" name="4a.rom"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="82s126.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            00 90 03 00 02 00 00 00 00 00 00 00 00 00 00 00
+            18 19 1A 1B 00 11 12 17 1C 1D 1E 1F 00 05 13 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <remark>Shoot The Bull (Bally Midway)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

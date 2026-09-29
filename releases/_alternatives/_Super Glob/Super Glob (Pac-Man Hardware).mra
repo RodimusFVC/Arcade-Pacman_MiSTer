@@ -1,0 +1,76 @@
+<misterromdescription>
+    <name>Super Glob (Pac-Man Hardware)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Super Glob</series>
+    <year>1983</year>
+    <manufacturer>Epos Corporation</manufacturer>
+    <category>Maze</category>
+
+    <setname>sprglobp</setname>
+    <parent>suprglob</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>2</num_buttons>
+    <buttons names="Fire,Button 2,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,DF,00">
+        <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Lives" bits="16,17" ids="3,4,5,6" values="3,2,1,0"/>
+        <dip name="Difficulty" bits="18,20" ids="Easiest,Very Easy,Easy,Normal,Difficult,Very Difficult,Very Hard,Hardest" values="7,6,5,4,3,2,1,0"/>
+        <dip name="Demo Sounds" bits="21" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="22" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="23" ids="Off,On" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="sprglobp.zip|suprglob.zip">
+        <part crc="829d0bea" name="u 2 the glob pg02284 eagle.u2"/>
+        <part crc="31de6628" name="u 3 the glob pg02284 eagle.u3"/>
+        <part repeat="0xC000">00</part>
+        <part crc="1aa16109" name="5e_2532.dat"/>
+        <part crc="afe72a89" name="5f_2532.dat"/>
+        <part repeat="0x2000">00</part>
+        <part crc="1f617527" name="7 f the glob.7f"/>
+        <part crc="28faa769" name="4 a the glob.4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="82s126.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            0B 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 00 11 00 0E 09 0B 0C 0A 0D 05 06 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <rom index="3" md5="none">
+        <part>
+            00 7B BD F1 00 FF 00 02 00 02 00 01 11 11 00 00
+            00 00 4C 48 00 3C 4D 00
+            00 00 4C B9 00 01 15 15
+            00 00 4C 93 00 01 01 01
+        </part>
+    </rom>
+    <rom index="4"></rom>
+    <nvram index="4" size="62"></nvram>
+
+    <remark>Super Glob (Pac-Man Hardware) (Epos Corporation)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

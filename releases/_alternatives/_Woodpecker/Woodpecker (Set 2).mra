@@ -1,0 +1,80 @@
+<misterromdescription>
+    <name>Woodpecker (Set 2)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Woodpecker</series>
+    <year>1981</year>
+    <manufacturer>Amenip</manufacturer>
+    <category>Maze</category>
+
+    <setname>woodpeca</setname>
+    <parent>woodpeck</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>1</num_buttons>
+    <buttons names="Fire,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Rack Test" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,C9,00">
+        <dip name="Rack Test (Cheat)" bits="4" ids="Off,On" values="1,0"/>
+        <dip name="Coinage" bits="16,17" ids="2C/1C,1C/1C,1C/2C,Free Play" values="3,1,2,0"/>
+        <dip name="Lives" bits="18,19" ids="1,2,3,5"/>
+        <dip name="Bonus Life" bits="20,21" ids="5000,10000,15000,None"/>
+        <dip name="Cabinet" bits="22" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Service Mode" bits="23" ids="Off,On" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="woodpeca.zip|woodpeck.zip">
+        <part crc="b5ee8bca" name="0"/>
+        <part repeat="0x7000">00</part>
+        <part crc="c5ec2de6" name="1"/>
+        <part crc="07ea534e" name="2"/>
+        <part crc="a3a3253a" name="3"/>
+        <part crc="6c50546b" name="4"/>
+        <part repeat="0x4000">00</part>
+        <part crc="0bf52102" name="10.5f"/>
+        <part crc="0ed8def8" name="11.5h"/>
+        <part repeat="0x2000">00</part>
+        <part crc="2fc650bd" name="pr.8h"/>
+        <part crc="d8772167" name="pr.4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="pr.1k"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            04 91 00 01 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 25 11 12 16 09 0B 0C 0A 05 13 14 0D
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <rom index="3" md5="none">
+        <part>
+            02 5E 55 E9 00 FF 00 02 00 02 00 01 11 11 00 00
+            00 00 4E 88 00 03 00 00
+            00 00 43 ED 00 06 40 40
+            00 00 4D DA 00 01 03 03
+        </part>
+    </rom>
+    <rom index="4"></rom>
+    <nvram index="4" size="10"></nvram>
+
+    <remark>Woodpecker (Set 2) (Amenip)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

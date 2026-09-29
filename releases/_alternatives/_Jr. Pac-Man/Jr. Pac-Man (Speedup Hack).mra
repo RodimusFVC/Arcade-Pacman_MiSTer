@@ -1,0 +1,83 @@
+<misterromdescription>
+    <name>Jr. Pac-Man (Speedup Hack)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>yes</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Jr. Pac-Man</series>
+    <year>1983</year>
+    <manufacturer>hack</manufacturer>
+    <category>Maze</category>
+
+    <setname>jrpacmanf</setname>
+    <parent>jrpacman</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>0</num_buttons>
+    <buttons names="Not Used,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Rack Test" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,C9,FF">
+        <dip name="Rack Test (Cheat)" bits="4" ids="Off,On" values="1,0"/>
+        <dip name="Service Mode" bits="12" ids="Off,On" values="1,0"/>
+        <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Coinage" bits="16,17" ids="2C/1C,1C/1C,1C/2C,Free Play" values="3,1,2,0"/>
+        <dip name="Lives" bits="18,19" ids="1,2,3,5"/>
+        <dip name="Bonus Life" bits="20,21" ids="10000,15000,20000,30000"/>
+        <dip name="Difficulty" bits="22" ids="Normal,Hard" values="1,0"/>
+        <dip name="Unknown" bits="23" ids="Off,On" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="jrpacmanf.zip|jrpacman.zip">
+        <part crc="461e8b57" name="fast_jr.8d"/>
+        <part crc="ec889e94" name="jr.pac-man_8e_11-9-83.8e"/>
+        <part repeat="0x4000">00</part>
+        <part crc="35f1fc6e" name="jr.pac-man_8h_11-9-83.8h"/>
+        <part crc="9737099e" name="jr.pac-man_8j_11-9-83.8j"/>
+        <part crc="5252dd97" name="jr.pac-man_8k_11-9-83.8k"/>
+        <part repeat="0x2000">00</part>
+        <part crc="0527ff9b" name="jr.pac-man_2c_11-9-83.2c"/>
+        <part crc="73477193" name="jr.pac-man_2e_11-9-83.2e"/>
+        <part repeat="0x20">00</part>
+        <part crc="9f6ea9d8" name="a290-27axv-axhd.9p"/>
+        <part repeat="0x4E0">00</part>
+        <part crc="029d35c4" name="a290-27axv-bxhd.9e"/>
+        <part crc="eee34a79" name="a290-27axv-cxhd.9f"/>
+        <part crc="a9cc86bf" name="a290-27axv-dxhd.7p"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            14 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 24 11 12 17 09 0B 0C 0A 00 13 14 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <rom index="3" md5="none">
+        <part>
+            0D DF 64 E8 00 FF 00 02 00 02 00 01 11 11 00 00
+            00 00 47 51 00 01 48 48
+            00 00 47 6D 00 06 40 40
+            00 00 4E 88 00 03 00 00
+        </part>
+    </rom>
+    <rom index="4"></rom>
+    <nvram index="4" size="10"></nvram>
+
+    <remark>Jr. Pac-Man (Speedup Hack)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

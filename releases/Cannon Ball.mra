@@ -1,0 +1,77 @@
+<misterromdescription>
+    <name>Cannon Ball</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Cannon Ball</series>
+    <year>1985</year>
+    <manufacturer>Novomatic</manufacturer>
+    <category>Maze</category>
+
+    <setname>cannonbp</setname>
+    <parent>cannonbp</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>1</num_buttons>
+    <buttons names="Fire,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,E7,00">
+        <dip name="Display" bits="16,17" ids="Scores and Progession Bars,Scores only,Progession Bars only,None" values="3,1,2,0"/>
+        <dip name="Cabinet" bits="18" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Lives" bits="19,20" ids="3,4,5,6"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="cannonbp.zip">
+        <part crc="c68878c7" name="n1-6e"/>
+        <part crc="ff3951a5" name="n2-6k"/>
+        <part crc="2329079d" name="n3-6f"/>
+        <part crc="fcc57ecb" name="n4-6m"/>
+        <part crc="52846c9d" name="n5-6h"/>
+        <part crc="59e890dd" name="n6-6n"/>
+        <part repeat="0xD000">00</part>
+        <part crc="125779e0" name="z1-5e"/>
+        <part crc="78f866c0" name="z3-5h"/>
+        <part crc="fbd2c99d" name="z2-5f"/>
+        <part crc="8734c904" name="z4-5j"/>
+        <part repeat="0x2000">00</part>
+        <part crc="08f8ae7e" name="colorprom_1"/>
+        <part crc="359a15dc" name="colorprom_2"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="82s126.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            0E 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 00 11 12 05 09 0B 0C 0A 00 13 14 0D
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <rom index="3" md5="none">
+        <part>
+            01 03 DB AD 00 FF 00 02 00 02 00 01 11 11 00 00
+            00 00 4D 80 00 DF 00 01
+        </part>
+    </rom>
+    <rom index="4"></rom>
+    <nvram index="4" size="223"></nvram>
+
+    <remark>Cannon Ball (Pac-Man Hardware) (Novomatic)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

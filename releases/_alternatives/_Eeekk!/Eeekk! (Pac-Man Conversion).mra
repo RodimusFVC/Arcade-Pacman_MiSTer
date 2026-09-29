@@ -1,0 +1,62 @@
+<misterromdescription>
+    <name>Eeekk! (Pac-Man Conversion)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Eeekk!</series>
+    <year>1984</year>
+    <manufacturer>Epos Corporation</manufacturer>
+    <category>Maze</category>
+
+    <setname>eeekkp</setname>
+    <parent>eeekk</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>1</num_buttons>
+    <buttons names="P1 Attack/2 Player Start,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,D3,00">
+        <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Lives" bits="16,17" ids="3,4,5,6" values="3,2,1,0"/>
+        <dip name="Difficulty" bits="18,20" ids="8 (Hard),7,6,5,4,3,2,1 (Easy)"/>
+        <dip name="Demo Sounds" bits="21" ids="On,Off"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="eeekkp.zip|eeekk.zip">
+        <part crc="701e37f2" name="u_2_eeekk_pg03094.u2"/>
+        <part crc="bcf524ae" name="u_3_eeekk_pg03094.u3"/>
+        <part repeat="0xC000">00</part>
+        <part crc="780183a8" name="5_e_eeekk_pg03094.5e"/>
+        <part crc="418526e4" name="5_f_eeekk_pg03094.5f"/>
+        <part repeat="0x2000">00</part>
+        <part crc="c64c8a53" name="7_f_eeekk.7f"/>
+        <part crc="a5044ded" name="4_a_eeekk.4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="82s126.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            0D 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 16 11 00 0D 09 0B 0C 0A 00 13 05 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <remark>Eeekk! (Pac-Man Conversion) (Epos Corporation)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

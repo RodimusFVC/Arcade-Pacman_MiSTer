@@ -1,0 +1,86 @@
+<misterromdescription>
+    <name>Naughty Mouse (Set 2)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Naughty Mouse</series>
+    <year>1981</year>
+    <manufacturer>Amenip Nova Games Ltd.</manufacturer>
+    <category>Maze</category>
+
+    <setname>nmouseb</setname>
+    <parent>nmouse</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>0</num_buttons>
+    <buttons names="Not Used,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Rack Test" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,C9,00">
+        <dip name="Rack Test (Cheat)" bits="4" ids="Off,On" values="1,0"/>
+        <dip name="Service Mode" bits="12" ids="Off,On" values="1,0"/>
+        <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Coinage" bits="16,17" ids="2C/1C,1C/1C,1C/2C,Free Play" values="3,1,2,0"/>
+        <dip name="Lives" bits="18,19" ids="1,2,3,5"/>
+        <dip name="Bonus Life" bits="20,21" ids="5000,10000,15000,None"/>
+        <dip name="Difficulty" bits="22" ids="Normal,Hard" values="1,0"/>
+        <dip name="Unknown" bits="23" ids="Off,On" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="nmouseb.zip|nmouse.zip">
+        <part crc="e447ecfa" name="naumouse.d7"/>
+        <part crc="2e6f13d9" name="naumouse.d6"/>
+        <part crc="44a80f97" name="naumouse.e7"/>
+        <part crc="9c7a46bd" name="naumouse.e6"/>
+        <part crc="405aa389" name="snatch2.bin"/>
+        <part crc="f58e7df4" name="snatch6.bin"/>
+        <part crc="06fb18ec" name="snatch3.bin"/>
+        <part crc="d187b82b" name="snatch7.bin"/>
+        <part repeat="0xC000">00</part>
+        <part crc="2ea7cc3f" name="naumouse.d5"/>
+        <part crc="0511fcea" name="naumouse.h5"/>
+        <part crc="f5a627cd" name="naumouse.e5"/>
+        <part crc="330230a5" name="snatch11.bin"/>
+        <part repeat="0x2000">00</part>
+        <part crc="2fc650bd" name="82s123.7f"/>
+        <part crc="d8772167" name="naumouse.a4"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="82s126.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            06 91 01 01 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 25 11 12 16 09 0B 0C 0A 00 13 14 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <rom index="3" md5="none">
+        <part>
+            02 5E 55 E9 00 FF 00 02 00 02 00 01 11 11 00 00
+            00 00 4E 88 00 03 00 00
+            00 00 C3 ED 00 07 40 40
+            00 00 4D CE 00 01 07 07
+        </part>
+    </rom>
+    <rom index="4"></rom>
+    <nvram index="4" size="11"></nvram>
+
+    <remark>Naughty Mouse (Set 2) (Amenip Nova Games Ltd.)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

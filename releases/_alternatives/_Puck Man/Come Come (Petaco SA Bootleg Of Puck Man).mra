@@ -1,0 +1,75 @@
+<misterromdescription>
+    <name>Come Come (Petaco SA Bootleg Of Puck Man)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>yes</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Pac-Man</series>
+    <year>1980</year>
+    <manufacturer>bootleg (Petaco SA)</manufacturer>
+    <category>Maze</category>
+
+    <setname>pacmanpe</setname>
+    <parent>puckman</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>0</num_buttons>
+    <buttons names="Not Used,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Rack Test" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,CC,00">
+        <dip name="Rack Test (Cheat)" bits="4" ids="Off,On" values="1,0"/>
+        <dip name="Service Mode" bits="12" ids="Off,On" values="1,0"/>
+        <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Bonus Life" bits="20,21" ids="10000,15000,20000,None"/>
+        <dip name="Difficulty" bits="22" ids="Normal,Hard" values="1,0"/>
+        <dip name="Ghost Names" bits="23" ids="Normal,Alternate" values="1,0"/>
+        <dip name="Coinage" bits="16,17" ids="2C/1C; 1C/1C,1C/2C; 1C/3C,1C/1C; 1C/3C,1C/1C; 1C/2C" values="3,1,2,0"/>
+        <dip name="Lives" bits="18" ids="2,3"/>
+        <dip name="Unknown" bits="19" ids="Off,On"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="pacmanpe.zip|puckman.zip">
+        <part crc="183d235a" name="come1.6e"/>
+        <part crc="2771c530" name="come5.6k"/>
+        <part crc="7d177853" name="come2.6f"/>
+        <part crc="d3e8914c" name="come6.6m"/>
+        <part crc="cc92abb1" name="come3.6h"/>
+        <part crc="8810b38e" name="come7.6n"/>
+        <part crc="a02ce07f" name="come4.6j"/>
+        <part crc="34e9566d" name="come8.6p"/>
+        <part repeat="0xC000">00</part>
+        <part crc="2229ab07" name="come9.5e"/>
+        <part crc="3591b89d" name="come11.5h"/>
+        <part crc="9e39323a" name="come10.5f"/>
+        <part crc="1b1d9096" name="come12.5j"/>
+        <part repeat="0x2000">00</part>
+        <part crc="2fc650bd" name="pm1-1.7f"/>
+        <part crc="3eb3a8e4" name="pm1-4.4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="pm1-3.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            00 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 25 12 11 16 09 0B 0C 0A 00 13 14 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <remark>Come Come (Petaco SA Bootleg Of Puck Man)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

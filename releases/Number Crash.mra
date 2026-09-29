@@ -1,0 +1,75 @@
+<misterromdescription>
+    <name>Number Crash</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Number Crash</series>
+    <year>1983</year>
+    <manufacturer>Hanshin Goraku / Peni</manufacturer>
+    <category>Maze</category>
+
+    <setname>numcrash</setname>
+    <parent>numcrash</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>1</num_buttons>
+    <buttons names="Fire,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Rack Test" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="BF,FF,F8,FF">
+        <dip name="Rack Test (Cheat)" bits="4" ids="Off,On" values="1,0"/>
+        <dip name="Coinage" bits="16,17" ids="4C/1C,3C/1C,2C/1C,1C/1C" values="3,2,1,0"/>
+        <dip name="Lives" bits="18,19" ids="1,2,3,4"/>
+        <dip name="Unknown" bits="20" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="21" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="22" ids="Off,On" values="1,0"/>
+        <dip name="Unknown" bits="23" ids="Off,On" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="numcrash.zip">
+        <part crc="c85a79ba" name="nc-1.6e"/>
+        <part crc="20e6c64d" name="nc-5.6k"/>
+        <part crc="a9d50002" name="nc-2.6f"/>
+        <part crc="7b8de692" name="nc-6.6m"/>
+        <part crc="e47f7cf3" name="nc-3.6h"/>
+        <part repeat="0x800">00</part>
+        <part crc="d9dee8cd" name="nc-4.6j"/>
+        <part repeat="0x4800">00</part>
+        <part crc="440c67e4" name="nc-7.6n"/>
+        <part crc="7dabb3e5" name="nc-8.6p"/>
+        <part repeat="0x6000">00</part>
+        <part crc="6a30b507" name="nc-9.5e"/>
+        <part crc="5f54d8e6" name="nc-11.5h"/>
+        <part crc="bdd352db" name="nc-10.5f"/>
+        <part crc="b104a8a9" name="nc-12.5j"/>
+        <part repeat="0x2000">00</part>
+        <part crc="2fc650bd" name="7051p1.7f"/>
+        <part crc="2bc5d339" name="7052.4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="7611p3.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            0F 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 04 03 02 25 00 00 00 05 00 00 00 00 11 13 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <remark>Number Crash (Hanshin Goraku / Peni)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

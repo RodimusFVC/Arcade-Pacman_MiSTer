@@ -1,0 +1,84 @@
+<misterromdescription>
+    <name>Penta (Bootleg)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>yes</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Pengo</series>
+    <year>1982</year>
+    <manufacturer>bootleg (Grinbee Shouji)</manufacturer>
+    <category>Maze</category>
+
+    <setname>penta</setname>
+    <parent>pengo</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>1</num_buttons>
+    <buttons names="Fire,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Rack Test" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,B0,CC">
+        <dip name="Bonus Life" bits="16" ids="30000,50000"/>
+        <dip name="Demo Sounds" bits="17" ids="Off,On" values="1,0"/>
+        <dip name="Cabinet" bits="18" ids="Upright,Cocktail"/>
+        <dip name="Lives" bits="19,20" ids="2,3,4,5" values="3,2,1,0"/>
+        <dip name="Rack Test (Cheat)" bits="21" ids="Off,On" values="1,0"/>
+        <dip name="Difficulty" bits="22,23" ids="Easy,Medium,Hard,Hardest" values="3,2,1,0"/>
+        <dip name="Coin A" bits="24,27" ids="4C/1C,3C/1C,2C/1C,2 Coins/1 Credit 5/3,2 Coins/1 Credit 4/3,1C/1C,1 Coin/1 Credit 5/6,1 Coin/1 Credit 4/5,1 Coin/1 Credit 2/3,1C/2C,1 Coin/2 Credits 5/11,1 Coin/2 Credits 4/9,1C/3C,1C/4C,1C/5C,1C/6C" values="0,8,4,9,5,12,13,3,11,2,7,15,10,6,14,1"/>
+        <dip name="Coin B" bits="28,31" ids="4C/1C,3C/1C,2C/1C,2 Coins/1 Credit 5/3,2 Coins/1 Credit 4/3,1C/1C,1 Coin/1 Credit 5/6,1 Coin/1 Credit 4/5,1 Coin/1 Credit 2/3,1C/2C,1 Coin/2 Credits 5/11,1 Coin/2 Credits 4/9,1C/3C,1C/4C,1C/5C,1C/6C" values="0,8,4,9,5,12,13,3,11,2,7,15,10,6,14,1"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="penta.zip|pengo.zip">
+        <part crc="22f328df" name="008_pn01.bin"/>
+        <part crc="15bbc7d3" name="007_pn05.bin"/>
+        <part crc="de82b74a" name="015_pn02.bin"/>
+        <part crc="160f3836" name="014_pn06.bin"/>
+        <part crc="7824e3ef" name="021_pn03.bin"/>
+        <part crc="377b9663" name="020_pn07.bin"/>
+        <part crc="bfde44c1" name="032_pn04.bin"/>
+        <part crc="64e8c30d" name="031_pn08.bin"/>
+        <part repeat="0x8000">00</part>
+        <part crc="6afeba9d" name="092_pn09.bin" offset="0x0" length="0x1000"/>
+        <part crc="5bfd26e9" name="105_pn10.bin" offset="0x0" length="0x1000"/>
+        <part crc="6afeba9d" name="092_pn09.bin" offset="0x1000" length="0x1000"/>
+        <part crc="5bfd26e9" name="105_pn10.bin" offset="0x1000" length="0x1000"/>
+        <part crc="3a5844ec" name="pr1633.ic78"/>
+        <part crc="766b139b" name="pr1634.ic88"/>
+        <part repeat="0x3E0">00</part>
+        <part crc="c29dea27" name="pr1635.ic51"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            17 95 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 02 03 04 11 12 17 05 09 0A 0B 0C 16 13 14 0D
+            00 00 00 00 00 24 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <rom index="3" md5="none">
+        <part>
+            00 18 BF 97 00 FF 00 02 00 02 00 01 11 11 00 00
+            00 00 88 40 00 1E D0 41
+            00 00 88 0C 00 02 D0 07
+        </part>
+    </rom>
+    <rom index="4"></rom>
+    <nvram index="4" size="32"></nvram>
+
+    <remark>Penta (Bootleg) (Grinbee Shouji Bootleg)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

@@ -1,0 +1,79 @@
+<misterromdescription>
+    <name>Pac-Gal (Set 2)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>yes</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Ms. Pac-Man</series>
+    <year>1981</year>
+    <manufacturer>bootleg</manufacturer>
+    <category>Maze</category>
+
+    <setname>pacgal2</setname>
+    <parent>mspacman</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>0</num_buttons>
+    <buttons names="Not Used,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Rack Test" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,C9,00">
+        <dip name="Rack Test (Cheat)" bits="4" ids="Off,On" values="1,0"/>
+        <dip name="Service Mode" bits="12" ids="Off,On" values="1,0"/>
+        <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Coinage" bits="16,17" ids="2C/1C,1C/1C,1C/2C,Free Play" values="3,1,2,0"/>
+        <dip name="Lives" bits="18,19" ids="1,2,3,5"/>
+        <dip name="Bonus Life" bits="20,21" ids="10000,15000,20000,None"/>
+        <dip name="Difficulty" bits="22" ids="Normal,Hard" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="pacgal2.zip|mspacman.zip">
+        <part crc="8167fffc" name="pmg1.bin"/>
+        <part crc="618bd9b3" name="pmg5.bin"/>
+        <part crc="7d177853" name="pmg2.bin"/>
+        <part crc="4f91d245" name="pmg6.bin"/>
+        <part crc="d0f20748" name="pmg3.bin"/>
+        <part crc="a948ce83" name="pmg7.bin"/>
+        <part crc="4c842da6" name="pmg4.bin"/>
+        <part crc="022764dc" name="pmg8.bin"/>
+        <part repeat="0x4000">00</part>
+        <part crc="f45fbbcd" name="u5.bin"/>
+        <part repeat="0x800">00</part>
+        <part crc="3fdcb271" name="u6a.bin"/>
+        <part repeat="0x1000">00</part>
+        <part crc="5fafec7c" name="u7a.bin"/>
+        <part repeat="0x4000">00</part>
+        <part crc="93933d1d" name="pmg9.bin"/>
+        <part crc="7409fbec" name="pmg11.bin"/>
+        <part crc="22b0188a" name="pmg10.bin"/>
+        <part crc="50c7477d" name="pmg12.bin"/>
+        <part repeat="0x2000">00</part>
+        <part crc="2fc650bd" name="82s123.7f"/>
+        <part crc="3eb3a8e4" name="82s126.4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="82s126.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            01 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 25 11 12 16 09 0B 0C 0A 00 13 14 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <remark>Pac-Gal (Set 2) (Bootleg)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

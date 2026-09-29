@@ -1,0 +1,68 @@
+<misterromdescription>
+    <name>Ms. Pacman Champion Edition / Zola-Puc Gal</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Ms. Pac-Man</series>
+    <year>1992</year>
+    <manufacturer>hack</manufacturer>
+    <category>Maze</category>
+
+    <setname>mschamp</setname>
+    <parent>mspacman</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>0</num_buttons>
+    <buttons names="Not Used,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Rack Test" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,C9,F9">
+        <dip name="Rack Test (Cheat)" bits="4" ids="Off,On" values="1,0"/>
+        <dip name="Service Mode" bits="12" ids="Off,On" values="1,0"/>
+        <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Coinage" bits="16,17" ids="2C/1C,1C/1C,1C/2C,Free Play" values="3,1,2,0"/>
+        <dip name="Lives" bits="18,19" ids="1,2,3,5"/>
+        <dip name="Bonus Life" bits="20,21" ids="10000,15000,20000,None"/>
+        <dip name="Difficulty" bits="22" ids="Normal,Hard" values="1,0"/>
+        <dip name="Timer" bits="24,25" ids="0:30,0:45,1:00,1:30" values="3,2,1,0"/>
+        <dip name="Speed" bits="26" ids="Slow,Fast" values="1,0"/>
+        <dip name="Game" bits="27" ids="Champion Edition,Super Zola Pac Gal" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="mschamp.zip|mspacman.zip">
+        <part crc="04dba113" name="9fg.bin"/>
+        <part crc="17435f53" name="8e.bin" offset="0x0" length="0x800"/>
+        <part crc="17435f53" name="8e.bin" offset="0x1000" length="0x800"/>
+        <part crc="17435f53" name="8e.bin" offset="0x800" length="0x800"/>
+        <part crc="17435f53" name="8e.bin" offset="0x1800" length="0x800"/>
+        <part repeat="0x2000">00</part>
+        <part crc="2fc650bd" name="82s123.7f"/>
+        <part crc="3eb3a8e4" name="82s126.4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="a9cc86bf" name="82s126.1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            02 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 25 11 12 16 09 0B 0C 0A 00 13 14 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <remark>Ms. Pacman Champion Edition / Zola-Puc Gal (Hack)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

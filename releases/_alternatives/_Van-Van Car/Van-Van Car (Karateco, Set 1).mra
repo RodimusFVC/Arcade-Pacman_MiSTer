@@ -1,0 +1,85 @@
+<misterromdescription>
+    <name>Van-Van Car (Karateco, Set 1)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>no</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Van-Van Car</series>
+    <year>1983</year>
+    <manufacturer>Sanritsu (Karateco license?)</manufacturer>
+    <category>Maze</category>
+
+    <setname>vanvank</setname>
+    <parent>vanvan</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (ccw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>1</num_buttons>
+    <buttons names="Fire,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,FE,00">
+        <dip name="Cabinet" bits="16" ids="Upright,Cocktail"/>
+        <dip name="Flip Screen" bits="17" ids="Off,On" values="1,0"/>
+        <dip name="Bonus Life" bits="18,19" ids="20k and 100k,40k and 140k,70k and 200k,None" values="2,1,0,3"/>
+        <dip name="Lives" bits="20,21" ids="3,4,5,6" values="3,2,1,0"/>
+        <dip name="Coin A" bits="22" ids="2C/1C,1C/1C"/>
+        <dip name="Coin B" bits="23" ids="1C/2C,1C/3C" values="1,0"/>
+        <dip name="Unknown" bits="24" ids="Off,On"/>
+        <dip name="Invulnerability (Cheat)" bits="25" ids="Off,On"/>
+        <dip name="Unknown" bits="26" ids="Off,On"/>
+        <dip name="Unknown" bits="27" ids="Off,On"/>
+        <dip name="Unknown" bits="28" ids="Off,On"/>
+        <dip name="Unknown" bits="29" ids="Off,On"/>
+        <dip name="Unknown" bits="30" ids="Off,On"/>
+        <dip name="Unknown" bits="31" ids="Off,On"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="vanvank.zip|vanvan.zip">
+        <part crc="00f48295" name="van1.bin"/>
+        <part crc="df58e1cb" name="van-2.51"/>
+        <part crc="15571e24" name="van-3.52"/>
+        <part crc="f8b37ed5" name="van4.bin"/>
+        <part repeat="0x4000">00</part>
+        <part crc="b8c1e089" name="van5.bin"/>
+        <part repeat="0x7000">00</part>
+        <part crc="60efbe66" name="van-20.18"/>
+        <part crc="5dd53723" name="van-21.19"/>
+        <part repeat="0x2000">00</part>
+        <part crc="ce1d9503" name="6331-1.6"/>
+        <part crc="4b803d9f" name="6301-1.37"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            13 13 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 05 11 00 12 09 0B 0C 0A 0D 13 14 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <rom index="3" md5="none">
+        <part>
+            00 25 1F 62 00 FF 00 02 00 02 00 01 11 11 00 00
+            00 00 48 09 00 06 00 00
+            00 00 4C 60 00 F0 00 00
+        </part>
+    </rom>
+    <rom index="4"></rom>
+    <nvram index="4" size="246"></nvram>
+
+    <remark>Van-Van Car (Karateco, Set 1) (Sanritsu (Karateco License?))</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>

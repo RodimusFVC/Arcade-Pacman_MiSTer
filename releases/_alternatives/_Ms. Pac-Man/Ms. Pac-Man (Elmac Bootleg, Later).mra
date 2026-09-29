@@ -1,0 +1,72 @@
+<misterromdescription>
+    <name>Ms. Pac-Man (Elmac Bootleg, Later)</name>
+    <region>World</region>
+    <homebrew>no</homebrew>
+    <bootleg>yes</bootleg>
+    <version></version>
+    <alternative></alternative>
+    <platform></platform>
+    <series>Ms. Pac-Man</series>
+    <year>1984</year>
+    <manufacturer>bootleg (Elmac)</manufacturer>
+    <category>Maze</category>
+
+    <setname>mspacmane2</setname>
+    <parent>mspacman</parent>
+    <mameversion>0289</mameversion>
+    <rbf>Pacman</rbf>
+    <about></about>
+
+    <resolution>15kHz</resolution>
+    <rotation>vertical (cw)</rotation>
+    <flip>yes</flip>
+
+    <players>2 (alternating)</players>
+    <joystick>4-way</joystick>
+    <special_controls></special_controls>
+    <num_buttons>0</num_buttons>
+    <buttons names="Not Used,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Rack Test" default="A,Y,B,X,Select,Start,R,L"/>
+
+    <switches default="FF,FF,C9,00">
+        <dip name="Rack Test (Cheat)" bits="4" ids="Off,On" values="1,0"/>
+        <dip name="Service Mode" bits="12" ids="Off,On" values="1,0"/>
+        <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>
+        <dip name="Coinage" bits="16,17" ids="2C/1C,1C/1C,1C/2C,Free Play" values="3,1,2,0"/>
+        <dip name="Lives" bits="18,19" ids="1,2,3,5"/>
+        <dip name="Bonus Life" bits="20,21" ids="10000,15000,20000,None"/>
+        <dip name="Difficulty" bits="22" ids="Normal,Hard" values="1,0"/>
+    </switches>
+
+    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <rom index="0" md5="none" zip="mspacmane2.zip|mspacman.zip">
+        <part crc="3ad0ae2f" name="mpe1.6e"/>
+        <part crc="0d32de5e" name="mpe2.6f"/>
+        <part crc="1821ee0b" name="mpe3.6h"/>
+        <part crc="d5e5d2aa" name="mpe4.6j"/>
+        <part repeat="0x4000">00</part>
+        <part crc="8c3e6de6" name="mpe5.6l"/>
+        <part crc="375f0693" name="mpe6.6m"/>
+        <part repeat="0x6000">00</part>
+        <part crc="93933d1d" name="mpe7.5e"/>
+        <part crc="7409fbec" name="mpe9.5h"/>
+        <part crc="22b0188a" name="mpe8.5f"/>
+        <part crc="50c7477d" name="mpe10.5j"/>
+        <part repeat="0x2000">00</part>
+        <part crc="2c3cc909" name="8h"/>
+        <part crc="4c8e83a4" name="4a"/>
+        <part repeat="0x6E0">00</part>
+        <part crc="7b1f9b71" name="1m"/>
+    </rom>
+
+    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <rom index="1">
+        <part>
+            04 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            01 03 04 02 25 11 12 16 09 0B 0C 0A 00 13 14 00
+            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+        </part>
+    </rom>
+
+    <remark>Ms. Pac-Man (Elmac Bootleg, Later)</remark>
+    <mratimestamp>20260928000000</mratimestamp>
+</misterromdescription>
