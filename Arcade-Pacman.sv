@@ -128,6 +128,8 @@ localparam CONF_STR = {
 	"P1OC,Orientation,Vert,Horz;",
 	"P1OB,HDMI Flip,Off,On;",
 	"P1OM,CRT Flip,Off,On;",
+	"P1O[40:37],H Position (CRT),0,+1,+2,+3,+4,+5,+6,+7,-8,-7,-6,-5,-4,-3,-2,-1;",
+	"P1O[44:41],V Position (CRT),0,+1,+2,+3,+4,+5,+6,+7,-8,-7,-6,-5,-4,-3,-2,-1;",
 	"P1OGI,Scandoubler Fx,None,HQ2x,CRT 25%,CRT 50%,CRT 75%;",
 	"-;",
 	"P2,Game Options;",
@@ -145,7 +147,7 @@ localparam CONF_STR = {
 	"-;",
 	"R0,Reset;",
 	"J1,Btn 1,Btn 2,Btn 3,Btn 4,Coin,Start 1P,Start 2P,Pause,Btn 5,Btn 6,Rack Test;",
-	"jn,A,Y,B,X,Select,Start,R,L;",
+	"jn,A,B,X,Y,Select,Start,R,L;",
 	"V,v",`BUILD_DATE
 };
 
@@ -421,6 +423,8 @@ pacman_board board
 	.ioctl_wr0(ioctl_wr & (ioctl_index == 8'd0)),
 
 	.crt_flip(status[22]),
+	.h_adj(status[40:37]),
+	.v_adj(status[44:41]),
 
 	.video_r(r),
 	.video_g(g),

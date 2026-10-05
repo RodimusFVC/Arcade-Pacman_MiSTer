@@ -25,7 +25,7 @@
     <joystick>8-way</joystick>
     <special_controls></special_controls>
     <num_buttons>6</num_buttons>
-    <buttons names="Fire,Button 2,Button 3,Button 4,Coin,Start 1P,Start 2P,Pause,Button 5,Button 6,Not Used" default="A,Y,B,X,Select,Start,R,L"/>
+    <buttons names="Fire,Button 2,Button 3,Button 4,Coin,Start 1P,Start 2P,Pause,Button 5,Button 6,Not Used" default="A,B,X,Y,Select,Start,R,L"/>
 
     <switches default="FF,FF,DF,00">
         <dip name="Cabinet" bits="15" ids="Upright,Cocktail" values="1,0"/>

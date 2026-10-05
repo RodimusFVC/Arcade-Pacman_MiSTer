@@ -48,6 +48,8 @@ module pacman_board
     input               ioctl_wr0,      // ioctl index 0
 
     input               crt_flip,
+    input  signed [3:0] h_adj,          // CRT position: HSYNC moved 2 pixels per step
+    input  signed [3:0] v_adj,          //               VSYNC moved 1 line per step
 
     output        [7:0] video_r,
     output        [7:0] video_g,
@@ -127,6 +129,13 @@ reg [8:0] vcnt = 9'h0F8;
 reg       hblank = 1'b1;
 
 wire vcnt_step    = (hcnt == 9'h0AF);
+
+// CRT position: only the sync pulses move, blanking stays put. HSYNC 0AF + 2h (inside hblank 097-0F6); VSYNC 8 lines
+// from line index 0 (vcnt 0F8) + v, wrapping at 264 (inside vblank 1F0-10F)
+wire [8:0] hs_on    = 9'h0AF + {{4{h_adj[3]}}, h_adj, 1'b0};
+wire [8:0] v_line   = vcnt - 9'h0F8;                               // 0-263
+wire [8:0] vs_start = v_adj[3] ? 9'd264 + {{5{1'b1}}, v_adj} : {5'd0, v_adj};
+wire [9:0] vs_end   = {1'b0, vs_start} + 10'd8;
 wire rising_vblank = vcnt_step & (vcnt == 9'h1EF);
 
 always @(posedge clk) begin
@@ -139,8 +148,8 @@ always @(posedge clk) begin
         else if (hcnt == (wide_hblank ? 9'h0FF : 9'h0EF)) hblank <= 1'b0;
         else if (hcnt == 9'h0F7) video_hblank <= 1'b0;
 
-        if      (hcnt == 9'h0AF) video_hs <= 1'b1;
-        else if (hcnt == 9'h0CF) video_hs <= 1'b0;
+        if      (hcnt == hs_on)          video_hs <= 1'b1;
+        else if (hcnt == hs_on + 9'h020) video_hs <= 1'b0;
 
         if (vcnt_step) begin
             if      (vcnt == 9'h1EF) video_vblank <= 1'b1;
@@ -149,7 +158,7 @@ always @(posedge clk) begin
     end
 end
 
-assign video_vs = ~vcnt[8];
+assign video_vs = (v_line >= vs_start && {1'b0, v_line} < vs_end) || (vs_end > 10'd264 && {1'b0, v_line} < vs_end - 10'd264);
 
 //----------------------------------------------------------- CPU --------------------------------------------------------------//
 
