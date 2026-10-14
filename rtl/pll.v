@@ -9,6 +9,8 @@ module pll (
 		input  wire        refclk,            //            refclk.clk
 		input  wire        rst,               //             reset.reset
 		output wire        outclk_0,          //           outclk0.clk
+		// DIAG-REVERT-2026-10-13: outclk_1 added (SDRAM clock)
+		output wire        outclk_1,
 		output wire        locked,            //            locked.export
 		input  wire [63:0] reconfig_to_pll,   //   reconfig_to_pll.reconfig_to_pll
 		output wire [63:0] reconfig_from_pll  // reconfig_from_pll.reconfig_from_pll
@@ -18,6 +20,8 @@ module pll (
 		.refclk            (refclk),            //            refclk.clk
 		.rst               (rst),               //             reset.reset
 		.outclk_0          (outclk_0),          //           outclk0.clk
+		// DIAG-REVERT-2026-10-13: outclk_1 added
+		.outclk_1          (outclk_1),
 		.locked            (locked),            //            locked.export
 		.reconfig_to_pll   (reconfig_to_pll),   //   reconfig_to_pll.reconfig_to_pll
 		.reconfig_from_pll (reconfig_from_pll)  // reconfig_from_pll.reconfig_from_pll

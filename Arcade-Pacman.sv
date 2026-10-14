@@ -135,6 +135,8 @@ localparam CONF_STR = {
 	"P2,Game Options;",
 	"H1P2O[33:32],Trackball Speed,Normal,Fast,Slow;",
 	"H2P2O[36:34],SDRAM Read Latch,Auto,Normal,Early,Late,Later;",
+	// DIAG-REVERT-2026-10-13: SDRAM clock phase option added
+	"H2P2O[48:45],SDRAM Clk Phase,Auto,0.0ns,1.4ns,2.8ns,4.2ns,5.7ns,7.1ns,8.5ns,9.9ns,11.3ns,12.7ns,14.1ns,15.5ns,17.0ns,18.4ns,19.8ns;",
 	"-;",
 	"P3,Pause Options;",
 	"P3OJ,Pause when OSD is open,On,Off;",
@@ -190,6 +192,8 @@ pll pll
 	.refclk(CLK_50M),
 	.rst(0),
 	.outclk_0(CLK_49M),
+	// DIAG-REVERT-2026-10-13: outclk_1 added
+	.outclk_1(CLK_SDRAM),
 	.reconfig_to_pll(reconfig_to_pll),
 	.reconfig_from_pll(reconfig_from_pll),
 	.locked(locked)
@@ -198,6 +202,10 @@ pll pll
 wire [63:0] reconfig_to_pll;
 wire [63:0] reconfig_from_pll;
 wire        cfg_waitrequest;
+wire        CLK_SDRAM;         // 49.152 MHz, same as CLK_49M at phase position 0
+wire        cfg_write;
+wire  [5:0] cfg_address;
+wire [31:0] cfg_data;
 
 pll_cfg pll_cfg
 (
@@ -206,12 +214,41 @@ pll_cfg pll_cfg
 	.mgmt_waitrequest(cfg_waitrequest),
 	.mgmt_read(0),
 	.mgmt_readdata(),
-	.mgmt_write(0),
-	.mgmt_address(0),
-	.mgmt_writedata(0),
+	// DIAG-REVERT-2026-10-13: original below — writes now come from sdram_phase_ctl
+	// .mgmt_write(0),
+	// .mgmt_address(0),
+	// .mgmt_writedata(0),
+	.mgmt_write(cfg_write),
+	.mgmt_address(cfg_address),
+	.mgmt_writedata(cfg_data),
 	.reconfig_to_pll(reconfig_to_pll),
 	.reconfig_from_pll(reconfig_from_pll)
 );
+
+// DIAG-REVERT-2026-10-13: SDRAM clock phase block added. One DPS step = VCO/8 = 283 ps
+// (442.368 MHz VCO), 72 per 49.152 MHz period; manual OSD entries are 5 steps. Auto:
+// pacman_sdrom sweeps all 72 after an SDRAM-set load and parks mid-window.
+wire       ph_auto = (status[48:45] == 4'd0);
+wire [6:0] cal_ph;
+wire       cal_tgl, cal_hold, ph_ack_tgl;
+
+sdram_phase_ctl #(.CNT_SEL(5'd1), .MAN_STEP(7'd5)) phase_ctl
+(
+	.clk(CLK_50M),
+	.sel(status[48:45]),
+	.cal_val(cal_ph),
+	.cal_tgl(cal_tgl),
+	.ack_tgl(ph_ack_tgl),
+	.cfg_waitrequest(cfg_waitrequest),
+	.cfg_write(cfg_write),
+	.cfg_address(cfg_address),
+	.cfg_data(cfg_data)
+);
+
+// Phase moved: ack the calibrator and re-measure the read latch.
+reg  [2:0] ph_ack_s = 3'd0;
+always @(posedge CLK_49M) ph_ack_s <= {ph_ack_s[1:0], ph_ack_tgl};
+wire       sdr_recal = ph_ack_s[2] ^ ph_ack_s[1];
 
 // 6.144 MHz pixel clock enable (18.432 MHz / 3)
 reg [2:0] ce_div = 3'd0;
@@ -219,7 +256,9 @@ always @(posedge CLK_49M) ce_div <= ce_div + 3'd1;
 wire ce6 = (ce_div == 3'd0);
 
 // Hold the Z80 in reset until the PLL is locked and the ROM download has finished
-wire reset = RESET | status[0] | buttons[1] | ioctl_download | ~locked;
+// DIAG-REVERT-2026-10-13: original below — cal_hold keeps the game in reset through the phase sweep
+// wire reset = RESET | status[0] | buttons[1] | ioctl_download | ~locked;
+wire reset = RESET | status[0] | buttons[1] | ioctl_download | ~locked | cal_hold;
 
 ///////////////////         Keyboard           //////////////////
 
@@ -471,6 +510,14 @@ pacman_sdrom sdrom
 	.cpu_data(sdr_data),
 	.cpu_busy(sdr_busy),
 
+	// DIAG-REVERT-2026-10-13: calibration ports added
+	.recal(sdr_recal),
+	.ph_auto(ph_auto),
+	.ld_hold(status[0]),
+	.ph_req_val(cal_ph),
+	.ph_req_tgl(cal_tgl),
+	.cal_hold(cal_hold),
+
 	.SDRAM_DQ(SDRAM_DQ),
 	.SDRAM_A(SDRAM_A),
 	.SDRAM_DQML(SDRAM_DQML),
@@ -481,7 +528,35 @@ pacman_sdrom sdrom
 	.SDRAM_nRAS(SDRAM_nRAS),
 	.SDRAM_nCAS(SDRAM_nCAS),
 	.SDRAM_CKE(SDRAM_CKE),
-	.SDRAM_CLK(SDRAM_CLK)
+	// DIAG-REVERT-2026-10-13: original below — SDRAM_CLK now comes from CLK_SDRAM
+	// .SDRAM_CLK(SDRAM_CLK)
+	.SDRAM_CLK()
+);
+
+// DIAG-REVERT-2026-10-13: SDRAM_CLK driver added. Same inverted DDR output as sdram.sv's, on CLK_SDRAM.
+altddio_out
+#(
+	.extend_oe_disable("OFF"),
+	.intended_device_family("Cyclone V"),
+	.invert_output("OFF"),
+	.lpm_hint("UNUSED"),
+	.lpm_type("altddio_out"),
+	.oe_reg("UNREGISTERED"),
+	.power_up_high("OFF"),
+	.width(1)
+)
+sdramclk_ddr
+(
+	.datain_h(1'b0),
+	.datain_l(1'b1),
+	.outclock(CLK_SDRAM),
+	.dataout(SDRAM_CLK),
+	.aclr(1'b0),
+	.aset(1'b0),
+	.oe(1'b1),
+	.outclocken(1'b1),
+	.sclr(1'b0),
+	.sset(1'b0)
 );
 
 // Hiscore: config = MRA index 3, dump = index 4; RAM via the board's second port while the CPU is paused

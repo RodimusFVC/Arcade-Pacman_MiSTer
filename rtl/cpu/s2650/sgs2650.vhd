@@ -626,6 +626,7 @@ BEGIN
           -- next opcode comes from IAR, not the I/O port address
           ad_c<=iar;
           ph_c<=phCODE;
+          wr_c<='0'; -- the fetch after WRTx is a read, not another write cycle
           IF ri(7)='0' THEN -- READ IO : REDE,REDD,REDC
             rd_c<=dr;
             rd_maj_c<='1';

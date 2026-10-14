@@ -21,5 +21,7 @@ set_global_assignment -name VERILOG_FILE rtl/mister_custom/hiscore.v
 
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/rom_loader.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/pacman_sdrom.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/sdram_phase_cal.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/sdram_phase_ctl.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/sdram.sv
 set_global_assignment -name VHDL_FILE rtl/ram_rom/dpram_dc.vhd

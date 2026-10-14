@@ -128,6 +128,21 @@ CTL = {("JOYSTICK_UP", 1): 1, ("JOYSTICK_DOWN", 1): 2, ("JOYSTICK_LEFT", 1): 3, 
 TRACKBALL = {"TRACKBALL_X": 24, "TRACKBALL_Y": 28}   # ids 24-27 / 28-31 = counter bits 0-3
 IGNORED_TYPES = {"UNUSED", "UNKNOWN"}
 WORKING_HERE = {"schick"}                           # MAME NOT_WORKING, HW-confirmed playable on this core (2026-09-29)
+# HBMAME hbmspacman.cpp: Crazy Otto reconstructions (woodpek board). One merged hbmspacman.zip with per-set
+# subfolders; the MiSTer loader finds each part by CRC. Drop-in Ms. Pac-Man hacks keep the parent's hiscore block.
+HBMAME_ZIP = {s: "hbmspacman.zip" for s in ("cottoh", "cottoh2", "ottop1", "ottop2", "ottop3", "ottopz", "ottopza",
+                                             "superp4g", "superp4m", "womanp5")}
+HBMAME_INPUTS = {"mspacpls": "mspacman"}           # HBMAME-only port set, not in our sources
+HISCORE_FROM = {s: "mspacman" for s in HBMAME_ZIP}
+# HBMAME macro = MAME mspacman's PROM regions
+PACMAN_PROMS = """
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+	ROM_REGION( 0x0200, "namco", 0 )
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
+"""
 RACK_HOLD, RACK_TOGGLE = 36, 37                     # Rack Test cheat button (no default pad mapping)
 
 SERIES_BY_PARENT = {"puckman": ("Pac-Man", "Maze"), "eyes": ("Eyes", "Maze"), "mrtnt": ("Mr. TNT", "Maze"),
@@ -448,7 +463,7 @@ HISCORES = parse_hiscores(HISCORE_DAT) if HISCORE_DAT.exists() else {}
 
 
 def hiscore_xml(g):
-    lines = HISCORES.get(g["name"])
+    lines = HISCORES.get(HISCORE_FROM.get(g["name"], g["name"]))
     if not lines:
         return ""
     ents = []
@@ -480,7 +495,7 @@ def hiscore_xml(g):
 
 def mra(g, games, segs, build_inputs):
     variant = SUPPORTED[(g["machine"], g["init"])]
-    ports = build_inputs(g["inputs"])
+    ports = build_inputs(HBMAME_INPUTS.get(g["inputs"], g["inputs"]))
     idle, dips, imap, fourway, buttons, tb_rev, impulse = input_config(g, ports)
     twoway = any(f.get("twoway") for fields in ports.values() for f in fields)
     flags = (F_4WAY if fourway else 0) | (F_IMPULSE if impulse else 0) | (F_WIDE if g["init"] in WIDE_INITS or g["machine"] in WIDE_MACHINES else 0) | \
@@ -491,7 +506,7 @@ def mra(g, games, segs, build_inputs):
                      [buttons.get(i, "Not Used") for i in (5, 6)] +
                      ["Rack Test" if RACK_HOLD in imap or RACK_TOGGLE in imap else "Not Used"])
     parent = g["parent"] or g["name"]
-    zipname = f'{g["name"]}.zip' + (f'|{g["parent"]}.zip' if g["parent"] else "")
+    zipname = HBMAME_ZIP.get(g["name"], f'{g["name"]}.zip') + (f'|{g["parent"]}.zip' if g["parent"] else "")
     rotation = {"ROT0": "horizontal", "ROT270": "vertical (ccw)", "ROT90": "vertical (cw)"}[g["rot"]]
     bootleg = "yes" if "bootleg" in g["manuf"].lower() or "hack" in g["desc"].lower() else "no"
     top = games.get(parent, g)                         # parent may live in another driver (suprglob: epos)
@@ -617,7 +632,7 @@ def out_path(root, g, games):
 
 
 def main():
-    src = "\n".join(Path(f).read_text() for f in sys.argv[1].split(","))
+    src = "\n".join(Path(f).read_text() for f in sys.argv[1].split(",")).replace("PACMAN_PROMS", PACMAN_PROMS)
     out_dir = Path(sys.argv[2])
     games = parse_games(src)
     build_inputs = parse_inputs(src)
