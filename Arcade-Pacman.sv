@@ -135,7 +135,6 @@ localparam CONF_STR = {
 	"P2,Game Options;",
 	"H1P2O[33:32],Trackball Speed,Normal,Fast,Slow;",
 	"H2P2O[36:34],SDRAM Read Latch,Auto,Normal,Early,Late,Later;",
-	// DIAG-REVERT-2026-10-13: SDRAM clock phase option added
 	"H2P2O[48:45],SDRAM Clk Phase,Auto,0.0ns,1.4ns,2.8ns,4.2ns,5.7ns,7.1ns,8.5ns,9.9ns,11.3ns,12.7ns,14.1ns,15.5ns,17.0ns,18.4ns,19.8ns;",
 	"-;",
 	"P3,Pause Options;",
@@ -192,7 +191,6 @@ pll pll
 	.refclk(CLK_50M),
 	.rst(0),
 	.outclk_0(CLK_49M),
-	// DIAG-REVERT-2026-10-13: outclk_1 added
 	.outclk_1(CLK_SDRAM),
 	.reconfig_to_pll(reconfig_to_pll),
 	.reconfig_from_pll(reconfig_from_pll),
@@ -214,10 +212,7 @@ pll_cfg pll_cfg
 	.mgmt_waitrequest(cfg_waitrequest),
 	.mgmt_read(0),
 	.mgmt_readdata(),
-	// DIAG-REVERT-2026-10-13: original below — writes now come from sdram_phase_ctl
-	// .mgmt_write(0),
-	// .mgmt_address(0),
-	// .mgmt_writedata(0),
+	// writes come from sdram_phase_ctl
 	.mgmt_write(cfg_write),
 	.mgmt_address(cfg_address),
 	.mgmt_writedata(cfg_data),
@@ -225,7 +220,7 @@ pll_cfg pll_cfg
 	.reconfig_from_pll(reconfig_from_pll)
 );
 
-// DIAG-REVERT-2026-10-13: SDRAM clock phase block added. One DPS step = VCO/8 = 283 ps
+// SDRAM clock phase. One DPS step = VCO/8 = 283 ps
 // (442.368 MHz VCO), 72 per 49.152 MHz period; manual OSD entries are 5 steps. Auto:
 // pacman_sdrom sweeps all 72 after an SDRAM-set load and parks mid-window.
 wire       ph_auto = (status[48:45] == 4'd0);
@@ -256,8 +251,7 @@ always @(posedge CLK_49M) ce_div <= ce_div + 3'd1;
 wire ce6 = (ce_div == 3'd0);
 
 // Hold the Z80 in reset until the PLL is locked and the ROM download has finished
-// DIAG-REVERT-2026-10-13: original below — cal_hold keeps the game in reset through the phase sweep
-// wire reset = RESET | status[0] | buttons[1] | ioctl_download | ~locked;
+// cal_hold keeps the game in reset through the phase sweep
 wire reset = RESET | status[0] | buttons[1] | ioctl_download | ~locked | cal_hold;
 
 ///////////////////         Keyboard           //////////////////
@@ -510,7 +504,6 @@ pacman_sdrom sdrom
 	.cpu_data(sdr_data),
 	.cpu_busy(sdr_busy),
 
-	// DIAG-REVERT-2026-10-13: calibration ports added
 	.recal(sdr_recal),
 	.ph_auto(ph_auto),
 	.ld_hold(status[0]),
@@ -528,12 +521,11 @@ pacman_sdrom sdrom
 	.SDRAM_nRAS(SDRAM_nRAS),
 	.SDRAM_nCAS(SDRAM_nCAS),
 	.SDRAM_CKE(SDRAM_CKE),
-	// DIAG-REVERT-2026-10-13: original below — SDRAM_CLK now comes from CLK_SDRAM
-	// .SDRAM_CLK(SDRAM_CLK)
+	// SDRAM_CLK is driven from CLK_SDRAM below
 	.SDRAM_CLK()
 );
 
-// DIAG-REVERT-2026-10-13: SDRAM_CLK driver added. Same inverted DDR output as sdram.sv's, on CLK_SDRAM.
+// SDRAM_CLK: same inverted DDR output as sdram.sv's, on the phase-steppable CLK_SDRAM.
 altddio_out
 #(
 	.extend_oe_disable("OFF"),

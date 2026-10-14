@@ -24,7 +24,6 @@ module pacman_sdrom
     output reg    [7:0] cpu_data = 8'd0,
     output              cpu_busy,       // hold the CPU (WAIT) until the byte is back
 
-    // DIAG-REVERT-2026-10-13: SDRAM clock phase calibration ports added (sdram_phase_cal)
     input               recal,          // pulse: SDRAM clock phase moved (re-probe the latch)
     input               ph_auto,        // OSD phase = Auto
     input               ld_hold,        // status[0], held across the MRA load
@@ -102,8 +101,6 @@ always @(posedge clk) begin
     end
 end
 
-// DIAG-REVERT-2026-10-13: original below
-// reg         probing = 1'b0, sd_probe = 1'b0, det_ok = 1'b0, dl_d = 1'b0;
 reg         probing = 1'b0, sd_probe = 1'b0, det_ok = 1'b0, dl_d = 1'b0, prb_req = 1'b0;
 reg   [1:0] prb_dly = 2'd0, prb_ph = 2'd0, rd_det = RD_NORMAL;
 reg   [3:0] prb_ok = 4'hF;              // {Later, Late, Normal, Early} still matching
@@ -118,7 +115,7 @@ wire  [3:0] prb_ok_nxt = {prb_ok[3] && (sd_dout == prb_wd),     // completion +2
 wire  [1:0] rd_sel      = (rd_auto && det_ok) ? rd_det : rd_mode;
 wire [15:0] sd_dout_sel = (rd_sel == RD_EARLY) ? sd_dout_d1 : sd_dout;
 
-// ---- SDRAM clock phase calibration (DIAG-REVERT-2026-10-13: block added) ----
+// ---- SDRAM clock phase calibration ----
 // Reference = the index 2 region (SDRAM word 0 up), checksummed as it downloads.
 wire        cal_busy, cal_rd_go;
 wire [14:0] cal_rd_word;
@@ -140,8 +137,7 @@ sdram_phase_cal #(.POS(7'd72), .LATCH_MASK(4'hF), .QUIET_BITS(21)) phase_cal
     .busy(cal_busy), .hold(cal_hold)
 );
 
-// DIAG-REVERT-2026-10-13: original below — cal_busy holds the HPS while an aborted sweep restores the phase
-// assign ioctl_wait = sd_busy | wr_pend;
+// cal_busy holds the HPS while an aborted sweep restores the phase
 assign ioctl_wait = sd_busy | wr_pend | cal_busy;
 assign cpu_busy   = cpu_req & ~(have_ok & have_addr == cpu_addr);
 
@@ -150,15 +146,11 @@ always @(posedge clk) begin
         sd_rd <= 1'b0; sd_wr <= 1'b0; sd_busy <= 1'b0; sd_refresh <= 1'b0; sd_refresh_cnt <= 9'd0;
         sd_old_ready <= 1'b1; wr_pend <= 1'b0; have_ok <= 1'b0; rd_pend <= 1'b0; rd_cnt <= 2'd0;
         probing <= 1'b0; sd_probe <= 1'b0; prb_dly <= 2'd0; det_ok <= 1'b0; dl_d <= 1'b0;
-        prb_req <= 1'b0; sd_cal <= 1'b0;   // DIAG-REVERT-2026-10-13: added
+        prb_req <= 1'b0; sd_cal <= 1'b0;
     end
     else begin
         // Probe once the download's last write has drained
         dl_d <= ioctl_download;
-        // DIAG-REVERT-2026-10-13: original block commented out below
-        // if (dl_d && !ioctl_download && ref_vld && !wr_pend && !sd_busy) begin
-        //     probing <= 1'b1; prb_ph <= 2'd0; prb_ok <= 4'hF; prb_to <= 16'd0;
-        // end
         // Held until it can start (the edge-only trigger skipped the probe when sd_busy was
         // high that cycle); a phase move re-runs it. The probe read waits for !sd_busy below.
         if ((dl_d && !ioctl_download) || recal) prb_req <= 1'b1;
@@ -181,8 +173,7 @@ always @(posedge clk) begin
         else sd_refresh_cnt <= sd_refresh_cnt + 9'd1;
 
         sd_old_ready <= sd_ready;
-        // DIAG-REVERT-2026-10-13: original below — a phase move invalidates the held byte
-        // if (ioctl_download) have_ok <= 1'b0;
+        // a phase move invalidates the held byte
         if (ioctl_download || recal) have_ok <= 1'b0;
 
         if (ioctl_wr2) begin
@@ -204,7 +195,7 @@ always @(posedge clk) begin
                         prb_e <= sd_dout_d1; prb_n <= sd_dout;
                         prb_dly <= 2'd2; sd_probe <= 1'b0;
                     end
-                    // DIAG-REVERT-2026-10-13: calibration read (sampled inside sdram_phase_cal)
+                    // calibration read (sampled inside sdram_phase_cal)
                     else if (sd_cal) sd_cal <= 1'b0;
                     else if (rd_sel >= RD_LATE) begin
                         rd_pend <= 1'b1;
@@ -225,7 +216,6 @@ always @(posedge clk) begin
             sd_wr   <= 1'b1; sd_busy <= 1'b1; sd_was_rd <= 1'b0;
             wr_pend <= ioctl_wr2;                 // keep a byte arriving this cycle
         end
-        // DIAG-REVERT-2026-10-13: calibration read issue added
         else if (cal_take) begin
             sd_addr <= {11'd0, cal_rd_word};
             sd_rd   <= 1'b1; sd_busy <= 1'b1; sd_was_rd <= 1'b1; sd_cal <= 1'b1;
@@ -235,8 +225,6 @@ always @(posedge clk) begin
             prb_wd  <= ref_w[prb_ph];
             sd_rd   <= 1'b1; sd_busy <= 1'b1; sd_was_rd <= 1'b1; sd_probe <= 1'b1;
         end
-        // DIAG-REVERT-2026-10-13: original below
-        // else if (cpu_busy && !ioctl_download && !probing && !rd_pend) begin
         else if (cpu_busy && !ioctl_download && !probing && !cal_busy && !rd_pend) begin
             sd_addr   <= {7'd0, cpu_addr[19:1]};
             sd_lsb    <= cpu_addr[0];
