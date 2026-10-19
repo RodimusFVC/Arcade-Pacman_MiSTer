@@ -20,6 +20,12 @@ module schick_sound
     input         [7:0] ioctl_dout,
     input               dl_rom,         // "audiocpu" region write (first 8K kept)
 
+    // shared chip pool (rtl/chip_pool_pkg.sv): z80sed_1 and AY 0-2
+    output chip_pool_pkg::z80sed_i_t z80sed_1_i,
+    input  chip_pool_pkg::z80sed_o_t z80sed_1_o,
+    output chip_pool_pkg::ay_i_t [2:0] ay_i,
+    input  chip_pool_pkg::ay_o_t [2:0] ay_o,
+
     output signed [15:0] audio
 );
 
@@ -35,27 +41,21 @@ wire  [7:0] dout;
 reg   [7:0] din;
 reg         nmi_n = 1'b1;
 
-T80sed cpu
-(
-    .RESET_n(~reset),
-    .CLK_n(clk),
-    .CLKEN(ce_cpu & ~pause),
-    .WAIT_n(1'b1),
-    .INT_n(1'b1),
-    .NMI_n(nmi_n),
-    .BUSRQ_n(1'b1),
-    .M1_n(m1_n),
-    .MREQ_n(mreq_n),
-    .IORQ_n(iorq_n),
-    .RD_n(rd_n),
-    .WR_n(wr_n),
-    .RFSH_n(rfsh_n),
-    .HALT_n(),
-    .BUSAK_n(),
-    .A(a),
-    .DI(din),
-    .DO(dout)
-);
+// the shared T80sed (z80sed_1, pacman_board pool section)
+assign z80sed_1_i.reset_n = ~reset;
+assign z80sed_1_i.ce      = ce_cpu & ~pause;
+assign z80sed_1_i.wait_n  = 1'b1;
+assign z80sed_1_i.int_n   = 1'b1;
+assign z80sed_1_i.nmi_n   = nmi_n;
+assign z80sed_1_i.di      = din;
+assign m1_n   = z80sed_1_o.m1_n;
+assign mreq_n = z80sed_1_o.mreq_n;
+assign iorq_n = z80sed_1_o.iorq_n;
+assign rd_n   = z80sed_1_o.rd_n;
+assign wr_n   = z80sed_1_o.wr_n;
+assign rfsh_n = z80sed_1_o.rfsh_n;
+assign a      = z80sed_1_o.a;
+assign dout   = z80sed_1_o.dout;
 
 // NMI follows vblank (MAME append_inputline(INPUT_LINE_NMI)); the Z80 takes it on the falling edge of NMI_n
 always @(posedge clk) nmi_n <= ~vblank;
@@ -117,24 +117,16 @@ always @(posedge clk) begin
 end
 
 wire [9:0] snd1, snd2, snd3;
-jt49_bus #(.COMP(3'b010)) ay1
-(
-    .rst_n(~reset), .clk(clk), .clk_en(ce_ay),
-    .bdir(io_wr & a[7:1] == 7'h00), .bc1(~a[0]), .din(dout), .sel(1'b1), .dout(),
-    .sound(snd1), .A(), .B(), .C(), .sample(), .IOA_in(8'hFF), .IOA_out(), .IOB_in(8'hFF), .IOB_out()
-);
-jt49_bus #(.COMP(3'b010)) ay2
-(
-    .rst_n(~reset), .clk(clk), .clk_en(ce_ay),
-    .bdir(io_wr & a[7:1] == 7'h08), .bc1(~a[0]), .din(dout), .sel(1'b1), .dout(),
-    .sound(snd2), .A(), .B(), .C(), .sample(), .IOA_in(8'hFF), .IOA_out(), .IOB_in(8'hFF), .IOB_out()
-);
-jt49_bus #(.COMP(3'b010)) ay3
-(
-    .rst_n(~reset), .clk(clk), .clk_en(ce_ay),
-    .bdir(io_wr & a[7:1] == 7'h40), .bc1(~a[0]), .din(dout), .sel(1'b1), .dout(),
-    .sound(snd3), .A(), .B(), .C(), .sample(), .IOA_in(8'hFF), .IOA_out(), .IOB_in(8'hFF), .IOB_out()
-);
+// the shared AY 0-2 (g_ay, pacman_board pool section): ports 00, 10, 80
+assign ay_i[0].bdir = io_wr & a[7:1] == 7'h00;
+assign ay_i[1].bdir = io_wr & a[7:1] == 7'h08;
+assign ay_i[2].bdir = io_wr & a[7:1] == 7'h40;
+assign ay_i[0].ce = ce_ay;   assign ay_i[0].bc1 = ~a[0];  assign ay_i[0].din = dout;  assign ay_i[0].ioa_in = 8'hFF;  assign ay_i[0].iob_in = 8'hFF;
+assign ay_i[1].ce = ce_ay;   assign ay_i[1].bc1 = ~a[0];  assign ay_i[1].din = dout;  assign ay_i[1].ioa_in = 8'hFF;  assign ay_i[1].iob_in = 8'hFF;
+assign ay_i[2].ce = ce_ay;   assign ay_i[2].bc1 = ~a[0];  assign ay_i[2].din = dout;  assign ay_i[2].ioa_in = 8'hFF;  assign ay_i[2].iob_in = 8'hFF;
+assign snd1 = ay_o[0].sound;
+assign snd2 = ay_o[1].sound;
+assign snd3 = ay_o[2].sound;
 
 wire [11:0] mix = {2'b00, snd1} + {2'b00, snd2} + {2'b00, snd3};
 jt49_dcrm2 #(.sw(16)) dcrm

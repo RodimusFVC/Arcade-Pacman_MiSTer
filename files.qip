@@ -1,5 +1,6 @@
 set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
 
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/chip_pool_pkg.sv
 set_global_assignment -name SYSTEMVERILOG_FILE Arcade-Pacman.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/pacman_board.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/pacman_video.sv

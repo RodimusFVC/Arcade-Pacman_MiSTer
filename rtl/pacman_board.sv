@@ -121,6 +121,121 @@ wire v_nmi   = v_dshop | v_van;                         // vblank drives NMI, ga
 wire rom_hi  = v_wood | v_numc | v_club | v_dshop | v_van;   // ROM at 8000-BFFF too, no A15 mirror
 wire ram_48  = v_cball | v_dshop | v_van | v_pengo | v_jr | v_pgb | v_sabc;       // 4800-4BFF populated
 
+/////////////////////////////  Shared CPU / sound chip pool  /////////////////////////////
+
+// One board runs at a time: every CPU and sound chip is instanced once here and driven by the active board's bus
+// (rtl/chip_pool_pkg.sv), selected by variant. pm = Pac-Man board logic in this module, s26 = S2650 daughterboard,
+// vv = Van-Van, sch = Super Chick sound board (rtl/sound/schick_sound.sv).
+
+// z80sed_0: main CPU, every Z80 board (held in reset by the watchdog and on the S2650 boards)
+// T80sed holds MREQ/RD/WR through T2, so every access overlaps the CPU half of the sync bus
+chip_pool_pkg::z80sed_i_t pm_z80sed_0_i, z80sed_0_i;
+chip_pool_pkg::z80sed_o_t z80sed_0_o;
+assign z80sed_0_i = pm_z80sed_0_i;
+
+wire [15:0] z80sed_0_a;
+wire  [7:0] z80sed_0_do;
+wire        z80sed_0_m1_n, z80sed_0_mreq_n, z80sed_0_iorq_n, z80sed_0_rd_n, z80sed_0_wr_n, z80sed_0_rfsh_n;
+
+T80sed z80sed_0
+(
+    .RESET_n(z80sed_0_i.reset_n), .CLK_n(clk), .CLKEN(z80sed_0_i.ce), .WAIT_n(z80sed_0_i.wait_n),
+    .INT_n(z80sed_0_i.int_n), .NMI_n(z80sed_0_i.nmi_n), .BUSRQ_n(1'b1),
+    .M1_n(z80sed_0_m1_n), .MREQ_n(z80sed_0_mreq_n), .IORQ_n(z80sed_0_iorq_n), .RD_n(z80sed_0_rd_n), .WR_n(z80sed_0_wr_n),
+    .RFSH_n(z80sed_0_rfsh_n), .HALT_n(), .BUSAK_n(), .A(z80sed_0_a), .DI(z80sed_0_i.di), .DO(z80sed_0_do)
+);
+
+assign z80sed_0_o.a = z80sed_0_a;           assign z80sed_0_o.dout = z80sed_0_do;
+assign z80sed_0_o.m1_n = z80sed_0_m1_n;     assign z80sed_0_o.mreq_n = z80sed_0_mreq_n; assign z80sed_0_o.iorq_n = z80sed_0_iorq_n;
+assign z80sed_0_o.rd_n = z80sed_0_rd_n;     assign z80sed_0_o.wr_n = z80sed_0_wr_n;     assign z80sed_0_o.rfsh_n = z80sed_0_rfsh_n;
+
+// z80sed_1: Super Chick sound board
+chip_pool_pkg::z80sed_i_t sch_z80sed_1_i, z80sed_1_i;
+chip_pool_pkg::z80sed_o_t z80sed_1_o;
+assign z80sed_1_i = sch_z80sed_1_i;
+
+wire [15:0] z80sed_1_a;
+wire  [7:0] z80sed_1_do;
+wire        z80sed_1_m1_n, z80sed_1_mreq_n, z80sed_1_iorq_n, z80sed_1_rd_n, z80sed_1_wr_n, z80sed_1_rfsh_n;
+
+T80sed z80sed_1
+(
+    .RESET_n(z80sed_1_i.reset_n), .CLK_n(clk), .CLKEN(z80sed_1_i.ce), .WAIT_n(z80sed_1_i.wait_n),
+    .INT_n(z80sed_1_i.int_n), .NMI_n(z80sed_1_i.nmi_n), .BUSRQ_n(1'b1),
+    .M1_n(z80sed_1_m1_n), .MREQ_n(z80sed_1_mreq_n), .IORQ_n(z80sed_1_iorq_n), .RD_n(z80sed_1_rd_n), .WR_n(z80sed_1_wr_n),
+    .RFSH_n(z80sed_1_rfsh_n), .HALT_n(), .BUSAK_n(), .A(z80sed_1_a), .DI(z80sed_1_i.di), .DO(z80sed_1_do)
+);
+
+assign z80sed_1_o.a = z80sed_1_a;           assign z80sed_1_o.dout = z80sed_1_do;
+assign z80sed_1_o.m1_n = z80sed_1_m1_n;     assign z80sed_1_o.mreq_n = z80sed_1_mreq_n; assign z80sed_1_o.iorq_n = z80sed_1_iorq_n;
+assign z80sed_1_o.rd_n = z80sed_1_rd_n;     assign z80sed_1_o.wr_n = z80sed_1_wr_n;     assign z80sed_1_o.rfsh_n = z80sed_1_rfsh_n;
+
+// s2650_0: S2650 boards (Driving Force, Eight Ball Action, Porky)
+chip_pool_pkg::s2650_i_t s26_s2650_0_i, s2650_0_i;
+chip_pool_pkg::s2650_o_t s2650_0_o;
+assign s2650_0_i = s26_s2650_0_i;
+
+wire        s2650_0_req, s2650_0_wr, s2650_0_mio, s2650_0_ene, s2650_0_dc, s2650_0_intack;
+wire [14:0] s2650_0_ad;
+wire  [7:0] s2650_0_dw;
+wire  [1:0] s2650_0_ph;
+
+s2650_cpu s2650_0
+(
+    .clk(clk), .reset(~s2650_0_i.reset_n), .req(s2650_0_req), .ack(s2650_0_i.ack), .ad(s2650_0_ad), .wr(s2650_0_wr),
+    .dw(s2650_0_dw), .dr(s2650_0_i.dr), .mio(s2650_0_mio), .ene(s2650_0_ene), .dc(s2650_0_dc), .ph(s2650_0_ph),
+    .irq(s2650_0_i.irq), .intack(s2650_0_intack), .ivec(8'h03), .sense(s2650_0_i.sense), .flag()
+);
+
+assign s2650_0_o.req = s2650_0_req;  assign s2650_0_o.ad = s2650_0_ad;    assign s2650_0_o.wr = s2650_0_wr;
+assign s2650_0_o.dw = s2650_0_dw;    assign s2650_0_o.mio = s2650_0_mio;  assign s2650_0_o.ene = s2650_0_ene;
+assign s2650_0_o.dc = s2650_0_dc;    assign s2650_0_o.ph = s2650_0_ph;    assign s2650_0_o.intack = s2650_0_intack;
+
+// AY-3-8910 x 3 (jt49_bus, COMP 010): Crush Roller AY board / Dream Shopper use 0, Super Chick 0-2
+chip_pool_pkg::ay_i_t [0:0] pm_ay_i;
+chip_pool_pkg::ay_i_t [2:0] sch_ay_i;
+chip_pool_pkg::ay_o_t [2:0] ay_o;
+
+genvar ai;
+generate
+    for (ai = 0; ai < 3; ai = ai + 1) begin : g_ay
+        chip_pool_pkg::ay_i_t i;
+        if (ai == 0) begin : g0 assign i = v_sch ? sch_ay_i[ai] : pm_ay_i[0]; end
+        else         begin : gn assign i = sch_ay_i[ai]; end
+        wire [7:0] dout, a, b, c, iob;
+        wire [9:0] snd;
+        jt49_bus #(.COMP(3'b010)) ay
+        (
+            .rst_n(~reset), .clk(clk), .clk_en(i.ce), .bdir(i.bdir), .bc1(i.bc1), .din(i.din), .sel(1'b1),
+            .dout(dout), .sound(snd), .A(a), .B(b), .C(c), .sample(),
+            .IOA_in(i.ioa_in), .IOA_out(), .IOB_in(i.iob_in), .IOB_out(iob)
+        );
+        assign ay_o[ai].dout = dout; assign ay_o[ai].a = a; assign ay_o[ai].b = b; assign ay_o[ai].c = c;
+        assign ay_o[ai].iob_out = iob; assign ay_o[ai].sound = snd;
+    end
+endgenerate
+
+// SN76489 x 2 (jt89): Van-Van uses 0-1, S2650 boards 0
+chip_pool_pkg::sn76489_i_t [1:0] vv_sn76489_i;
+chip_pool_pkg::sn76489_i_t [0:0] s26_sn76489_i;
+chip_pool_pkg::sn76489_o_t [1:0] sn76489_o;
+
+genvar si;
+generate
+    for (si = 0; si < 2; si = si + 1) begin : g_sn76489
+        chip_pool_pkg::sn76489_i_t i;
+        if (si == 0) begin : g0 assign i = v_s26 ? s26_sn76489_i[0] : vv_sn76489_i[si]; end
+        else         begin : gn assign i = vv_sn76489_i[si]; end
+        wire [10:0] snd;
+        wire        rdy;
+        jt89 sn76489
+        (
+            .rst(i.rst), .clk(clk), .clk_en(i.ce), .wr_n(i.wr_n), .cs_n(i.cs_n), .din(i.din), .sound(snd), .ready(rdy)
+        );
+        assign sn76489_o[si].sound = snd; assign sn76489_o[si].ready = rdy;
+    end
+endgenerate
+
 //------------------------------------------------------- Video timing --------------------------------------------------------//
 
 // H counts 080-1FF (384), V counts 0F8-1FF (264); 60.61 Hz
@@ -176,28 +291,21 @@ reg   [7:0] control_reg = 8'd0;         // LS259 at 8K: 0 IRQ enable, 1 sound en
 reg   [4:0] watchdog = 5'd0;
 wire        watchdog_reset = (watchdog == 5'd16);
 
-// T80sed holds MREQ/RD/WR through T2, so every access overlaps the CPU half of the sync bus
-T80sed z80
-(
-    .RESET_n(~(reset | watchdog_reset | v_s26)),
-    .CLK_n(clk),
-    .CLKEN(ce6 & hcnt[0] & ~pause),
-    .WAIT_n(sb_wait_n & ~sdr_busy),
-    .INT_n(cpu_int_n | v_nmi),
-    .NMI_n(cpu_int_n | ~v_nmi),
-    .BUSRQ_n(1'b1),
-    .M1_n(z80_m1_n),
-    .MREQ_n(z80_mreq_n),
-    .IORQ_n(z80_iorq_n),
-    .RD_n(z80_rd_n),
-    .WR_n(z80_wr_n),
-    .RFSH_n(z80_rfsh_n),
-    .HALT_n(),
-    .BUSAK_n(),
-    .A(z80_addr),
-    .DI(cpu_din),
-    .DO(z80_dout)
-);
+// the shared T80sed (z80sed_0, pool section above)
+assign pm_z80sed_0_i.reset_n = ~(reset | watchdog_reset | v_s26);
+assign pm_z80sed_0_i.ce      = ce6 & hcnt[0] & ~pause;
+assign pm_z80sed_0_i.wait_n  = sb_wait_n & ~sdr_busy;
+assign pm_z80sed_0_i.int_n   = cpu_int_n | v_nmi;
+assign pm_z80sed_0_i.nmi_n   = cpu_int_n | ~v_nmi;
+assign pm_z80sed_0_i.di      = cpu_din;
+assign z80_m1_n   = z80sed_0_o.m1_n;
+assign z80_mreq_n = z80sed_0_o.mreq_n;
+assign z80_iorq_n = z80sed_0_o.iorq_n;
+assign z80_rd_n   = z80sed_0_o.rd_n;
+assign z80_wr_n   = z80sed_0_o.wr_n;
+assign z80_rfsh_n = z80sed_0_o.rfsh_n;
+assign z80_addr   = z80sed_0_o.a;
+assign z80_dout   = z80sed_0_o.dout;
 
 // S2650 daughterboard (MAME s2650games): each access is registered on ack (every 12 pixels) and replayed on the Z80 socket
 wire        s26_req, s26_wr, s26_mio, s26_ene, s26_dc, s26_intack;
@@ -243,26 +351,21 @@ always @(posedge clk) begin
     else if (ce6 && variant == 8'd32 && s26_act && !s26_io && s26_w && s26_a[12:0] == 13'h15C7) s26_pbank <= s26_d[0];
 end
 
-s2650_cpu s2650
-(
-    .clk(clk),
-    .reset(reset | watchdog_reset | ~v_s26),
-    .req(s26_req),
-    .ack(s26_ack),
-    .ad(s26_ad),
-    .wr(s26_wr),
-    .dw(s26_dw),
-    .dr(s26_dr),
-    .mio(s26_mio),
-    .ene(s26_ene),
-    .dc(s26_dc),
-    .ph(s26_ph),
-    .irq(s26_int),
-    .intack(s26_intack),
-    .ivec(8'h03),
-    .sense(~video_vblank),
-    .flag()
-);
+// the shared S2650 (s2650_0, pool section above)
+assign s26_s2650_0_i.reset_n = ~(reset | watchdog_reset | ~v_s26);
+assign s26_s2650_0_i.ack     = s26_ack;
+assign s26_s2650_0_i.dr      = s26_dr;
+assign s26_s2650_0_i.irq     = s26_int;
+assign s26_s2650_0_i.sense   = ~video_vblank;
+assign s26_req    = s2650_0_o.req;
+assign s26_ad     = s2650_0_o.ad;
+assign s26_wr     = s2650_0_o.wr;
+assign s26_dw     = s2650_0_o.dw;
+assign s26_mio    = s2650_0_o.mio;
+assign s26_ene    = s2650_0_o.ene;
+assign s26_dc     = s2650_0_o.dc;
+assign s26_ph     = s2650_0_o.ph;
+assign s26_intack = s2650_0_o.intack;
 
 // extended port 1 = protection, answered by program counter (MAME pc() = REDE address + 2 = operand address + 1)
 wire [14:0] s26_pc = s26_lastcode + 15'd1;
@@ -1145,6 +1248,10 @@ schick_sound sch_snd
     .ioctl_addr(ioctl_addr),
     .ioctl_dout(ioctl_dout),
     .dl_rom(ioctl_wr0 & sch_snd_cs),
+    .z80sed_1_i(sch_z80sed_1_i),
+    .z80sed_1_o(z80sed_1_o),
+    .ay_i(sch_ay_i),
+    .ay_o(ay_o),
     .audio(sch_audio)
 );
 wire signed [10:0] sn1_snd, sn2_snd;
@@ -1168,25 +1275,16 @@ always @(posedge clk) begin
     else if (ay_wr | sn_io) ay_armed <= 1'b0;
 end
 
+// the shared AY 0 (g_ay, pool section above)
 wire [9:0] ay_sound;
-jt49_bus #(.COMP(3'b010)) ay
-(
-    .rst_n(~reset),
-    .clk(clk),
-    .clk_en(ay_cen),
-    .bdir(ay_wr),
-    .bc1(ay_wr ? cpu_addr[0] : 1'b1),
-    .din(cpu_dout),
-    .sel(1'b1),
-    .dout(ay_dout),
-    .sound(ay_sound),
-    .A(), .B(), .C(),
-    .sample(),
-    .IOA_in(dsw2),
-    .IOA_out(),
-    .IOB_in(8'hFF),
-    .IOB_out()
-);
+assign pm_ay_i[0].ce     = ay_cen;
+assign pm_ay_i[0].bdir   = ay_wr;
+assign pm_ay_i[0].bc1    = ay_wr ? cpu_addr[0] : 1'b1;
+assign pm_ay_i[0].din    = cpu_dout;
+assign pm_ay_i[0].ioa_in = dsw2;
+assign pm_ay_i[0].iob_in = 8'hFF;
+assign ay_dout  = ay_o[0].dout;
+assign ay_sound = ay_o[0].sound;
 
 jt49_dcrm2 #(.sw(16)) ay_dcrm
 (
@@ -1198,29 +1296,24 @@ jt49_dcrm2 #(.sw(16)) ay_dcrm
 );
 
 // Van-Van: two SN76496 at 1.78975 MHz on ports 01 and 02; S2650 boards: one at 3.072 MHz on the data port
-jt89 sn1
-(
-    .rst(reset),
-    .clk(clk),
-    .clk_en(v_s26 ? ce6 & hcnt[0] : ay_cen),
-    .wr_n(~(v_s26 ? s26_sn_w : sn_io & cpu_addr[7:0] == 8'h01)),
-    .cs_n(1'b0),
-    .din(cpu_dout),
-    .sound(sn1_snd),
-    .ready()
-);
-
-jt89 sn2
-(
-    .rst(reset),
-    .clk(clk),
-    .clk_en(ay_cen),
-    .wr_n(~(sn_io & cpu_addr[7:0] == 8'h02)),
-    .cs_n(1'b0),
-    .din(cpu_dout),
-    .sound(sn2_snd),
-    .ready()
-);
+// (the shared g_sn76489, pool section above)
+assign vv_sn76489_i[0].rst  = reset;
+assign vv_sn76489_i[0].ce   = ay_cen;
+assign vv_sn76489_i[0].wr_n = ~(sn_io & cpu_addr[7:0] == 8'h01);
+assign vv_sn76489_i[0].cs_n = 1'b0;
+assign vv_sn76489_i[0].din  = cpu_dout;
+assign vv_sn76489_i[1].rst  = reset;
+assign vv_sn76489_i[1].ce   = ay_cen;
+assign vv_sn76489_i[1].wr_n = ~(sn_io & cpu_addr[7:0] == 8'h02);
+assign vv_sn76489_i[1].cs_n = 1'b0;
+assign vv_sn76489_i[1].din  = cpu_dout;
+assign s26_sn76489_i[0].rst  = reset;
+assign s26_sn76489_i[0].ce   = ce6 & hcnt[0];
+assign s26_sn76489_i[0].wr_n = ~s26_sn_w;
+assign s26_sn76489_i[0].cs_n = 1'b0;
+assign s26_sn76489_i[0].din  = cpu_dout;
+assign sn1_snd = sn76489_o[0].sound;
+assign sn2_snd = sn76489_o[1].sound;
 
 pacman_wsg wsg
 (
