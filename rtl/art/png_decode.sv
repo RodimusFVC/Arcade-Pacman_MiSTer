@@ -156,7 +156,7 @@ wire  [7:0] lb_q;
 dpram_dc #(.widthad_a(15)) prev_line
 (
     .clock_a(clk), .address_a(lb_addr), .data_a(lb_d), .wren_a(lb_we), .q_a(lb_q),
-    .clock_b(clk), .address_b(15'd0), .q_b()
+    .clock_b(clk), .address_b(15'd0), .data_b('0), .wren_b(1'b0), .q_b()
 );
 
 localparam U_FILT = 3'd0, U_RD = 3'd1, U_CALC = 3'd2, U_EMIT = 3'd3, U_SUB = 3'd4;
@@ -174,6 +174,8 @@ reg  [31:0] pixb = 32'd0;               // bytes of the pixel being assembled
 reg   [2:0] pb = 3'd0;
 reg  [15:0] pxc = 16'd0;                // pixel index within the line
 reg         pal_pend = 1'b0;
+reg         pal_wait = 1'b0;          // 8-bit palette pixel: index registered, palette read this clock
+wire        pal_busy = pal_pend || pal_wait;
 reg   [7:0] pal_idx = 8'd0;
 
 wire  [7:0] fa = (bx < {13'd0, bpp}) ? 8'd0 : a4[8 * bpp - 1 -: 8];
@@ -188,20 +190,21 @@ wire  [8:0] avg   = ({1'b0, fa} + {1'b0, fb}) >> 1;
 wire  [7:0] pred  = (filt == 3'd1) ? fa : (filt == 3'd2) ? fb : (filt == 3'd3) ? avg[7:0] : (filt == 3'd4) ? paeth : 8'd0;
 wire  [7:0] recon = inf_out + pred;
 
-// palette read: the index is recon on the clock pal_pend is set, so the entry is on pal_q while pal_pend
-wire  [7:0] pal_ra = pal_pend ? pal_idx : (ust == U_SUB) ? sidx : recon;
+// palette read: 8-bit pixels register the index first (pal_wait: recon -> address was too long a path at 49 MHz);
+// sub-byte pixels address sidx (a register) directly. The entry is on pal_q while pal_pend.
+wire  [7:0] pal_ra = pal_busy ? pal_idx : sidx;
 dpram_dc #(.widthad_a(8), .width_a(24)) pal_rgb
 (
     .clock_a(clk), .address_a(pal_wa), .data_a(pal_wd), .wren_a(pal_we), .q_a(),
-    .clock_b(clk), .address_b(pal_ra), .q_b(pal_q)
+    .clock_b(clk), .address_b(pal_ra), .data_b('0), .wren_b(1'b0), .q_b(pal_q)
 );
 dpram_dc #(.widthad_a(8), .width_a(8)) pal_alpha
 (
     .clock_a(clk), .address_a(pal_wa), .data_a(pal_wd[7:0]), .wren_a(pal_awe), .q_a(),
-    .clock_b(clk), .address_b(pal_ra), .q_b(pal_aq)
+    .clock_b(clk), .address_b(pal_ra), .data_b('0), .wren_b(1'b0), .q_b(pal_aq)
 );
 
-always @* inf_out_ready = (ust == U_FILT) || (ust == U_CALC && !px_valid_hold && !pal_pend);
+always @* inf_out_ready = (ust == U_FILT) || (ust == U_CALC && !px_valid_hold && !pal_busy);
 
 reg px_valid_hold;
 always @* px_valid_hold = px_valid && !px_ready;
@@ -212,6 +215,7 @@ always @(posedge clk) begin
     if (px_valid && px_ready) px_valid <= 1'b0;
     if (img_start) begin ust <= U_FILT; row <= 16'd0; bx <= 16'd0; pb <= 3'd0; end
     // palette lookup finishing (one clock after the index)
+    if (pal_wait) begin pal_wait <= 1'b0; pal_pend <= 1'b1; end
     if (pal_pend) begin
         px_rgba  <= {pal_q, ({1'b0, pal_idx} < trns_n) ? pal_aq : 8'hFF};
         px_valid <= 1'b1;
@@ -220,7 +224,7 @@ always @(posedge clk) begin
     case (ust)
         U_FILT: if (inf_out_valid) begin filt <= inf_out[2:0]; bx <= 16'd0; pb <= 3'd0; pxc <= 16'd0; lb_addr <= 15'd0; ust <= U_RD; end
         U_RD:   ust <= U_CALC;                      // prior-line byte bx readable next clock
-        U_CALC: if (inf_out_valid && !px_valid_hold && !pal_pend) begin
+        U_CALC: if (inf_out_valid && !px_valid_hold && !pal_busy) begin
             lb_d  <= recon; lb_we <= 1'b1;          // overwrite the prior line in place
             a4    <= {a4[23:0], recon};
             c4    <= {c4[23:0], fb};
@@ -237,7 +241,7 @@ always @(posedge clk) begin
                     8'd6: begin px_rgba <= {pixb[23:0], recon}; px_valid <= 1'b1; end
                     8'd0: begin px_rgba <= {recon, recon, recon, 8'hFF}; px_valid <= 1'b1; end
                     8'd4: begin px_rgba <= {pixb[7:0], pixb[7:0], pixb[7:0], recon}; px_valid <= 1'b1; end
-                    default: begin pal_idx <= recon; pal_pend <= 1'b1; end
+                    default: begin pal_idx <= recon; pal_wait <= 1'b1; end
                 endcase
             end else pb <= pb + 3'd1;
             if (!sub) begin
@@ -251,7 +255,7 @@ always @(posedge clk) begin
                 end
             end
         end
-        U_SUB: if (!px_valid_hold && !pal_pend) begin
+        U_SUB: if (!px_valid_hold && !pal_busy) begin
             if (scnt != spb && pxc != width) begin  // one pixel per clock; the line's padding bits are dropped
                 px_x  <= pxc; pxc <= pxc + 16'd1;
                 px_y  <= row;

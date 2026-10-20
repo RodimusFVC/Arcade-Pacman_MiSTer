@@ -23,7 +23,8 @@
 //
 //============================================================================
 
-module artwork #(parameter [7:0] IDX = 8'd5)   // ioctl index of the artwork download
+module artwork #(parameter [7:0] IDX = 8'd5,    // ioctl index of the artwork download
+                 parameter int CODE_BITS = 5)   // rotated games: colours per frame = 2^CODE_BITS (5-8)
 (
     input             clk,
     input       [3:0] sel,             // 0 = off, n = view n of the layout table
@@ -153,7 +154,7 @@ wire  [7:0] hdr_q;
 dpram_dc #(.widthad_a(10)) hdr
 (
     .clock_a(clk), .address_a(ioctl_addr[9:0]), .data_a(ioctl_dout), .wren_a(hdr_wr), .q_a(),
-    .clock_b(clk), .address_b(hdr_ra), .q_b(hdr_q)
+    .clock_b(clk), .address_b(hdr_ra), .data_b('0), .wren_b(1'b0), .q_b(hdr_q)
 );
 
 reg  [63:0] bw_acc, bw_word;
@@ -228,7 +229,7 @@ wire  [4:0] ring_ra = r_rp[4:0];   // next word to read, presented ahead
 dpram_dc #(.widthad_a(5), .width_a(64)) rring
 (
     .clock_a(clk), .address_a(5'(r_base + ebeat[5:0])), .data_a(DDRAM_DOUT), .wren_a(e_rd[4]), .q_a(),
-    .clock_b(clk), .address_b(ring_ra), .q_b(ring_q)
+    .clock_b(clk), .address_b(ring_ra), .data_b('0), .wren_b(1'b0), .q_b(ring_q)
 );
 
 reg  [11:0] v_cw, v_ch, v_sx, v_sy, v_sw, v_sh, v_nw, v_nh;   // view geometry (as drawn: after view rotation)
@@ -384,7 +385,7 @@ reg         bc_we;
 dpram_dc #(.widthad_a(6), .width_a(64)) bcbuf
 (
     .clock_a(clk), .address_a(e_rd[3] ? ebeat[5:0] : bc_wa[5:0]), .data_a(e_rd[3] ? DDRAM_DOUT : bc_wd), .wren_a(e_rd[3] | bc_we), .q_a(),
-    .clock_b(clk), .address_b(bst == B_WR ? wb_nxt[5:0] : b_i[5:0]), .q_b(bc_q)
+    .clock_b(clk), .address_b(bst == B_WR ? wb_nxt[5:0] : b_i[5:0]), .data_b('0), .wren_b(1'b0), .q_b(bc_q)
 );
 assign b_wdata = fill ? S_INIT : bc_q;
 assign res_ready  = (bst == B_POS && !fill && b_out) || bst == B_C;
@@ -468,45 +469,122 @@ reg        frame_start = 1'b0, frame_end = 1'b0, vbl_rise = 1'b0, line_inc = 1'b
 wire       act_px = !hblank_in && !vblank_in;
 // line of the pixel being captured: a board may drop vblank on the frame's first pixel (Centipede), before gy_c resets
 wire [4:0] gy_w   = old_vbl ? 5'd0 : gy_c[4:0];
-// rotated games: the whole frame as 5-bit colour codes, 8 pixels a word, double-buffered at {buffer, index / 8}
-// (2 x 7680 words for 256 x 240). Each frame's first 32 colours get codes (a frame with more draws the rest as the
-// 32nd); the boards here show at most 32 at once.
+// rotated games: the whole frame as CODE_BITS-bit colour codes, 8 pixels a word, double-buffered at {buffer, index / 8}
+// (2 x 8064 words for 288 x 224). Each frame's first 2^CODE_BITS colours get codes (a frame with more draws the rest as
+// the last code). CODE_BITS 5: 32 parallel comparators, palette in registers. 6-8: hashed RGB -> code table (linear
+// probing, cleared in vblank) and a palette RAM; needs >= 8 clocks per pixel (one lookup takes up to 7).
+localparam int CB = CODE_BITS, NC = 1 << CODE_BITS, WW = 8 * CODE_BITS;
 reg  [15:0] cap_i = 16'd0, cap_tot = 16'd0;   // pixel index in the frame, pixels in the last frame
 reg         cap_buf = 1'b0;
-reg  [39:0] cap_acc;
-reg  [23:0] cpal[64];                // colour of code n in buffer b: {b, n}
-reg   [5:0] cpal_n = 6'd0;           // codes in use in the frame being captured
-reg  [31:0] cpal_hit;
-integer     ci;
-always @* for (ci = 0; ci < 32; ci = ci + 1) cpal_hit[ci] = ci < cpal_n && cpal[{cap_buf, 5'(ci)}] == rgb_in;
-reg   [4:0] hit_code;                // codes are unique, so at most one hit: OR of the hit indices
-always @* begin
-    hit_code = 5'd0;
-    for (ci = 0; ci < 32; ci = ci + 1) if (cpal_hit[ci]) hit_code = hit_code | 5'(ci);
-end
-wire        cpal_new = cpal_hit == 32'd0 && !cpal_n[5];
-wire  [4:0] cap_px  = cpal_hit != 32'd0 ? hit_code : cpal_n[5] ? 5'd31 : cpal_n[4:0];
+reg  [WW-1:0] cap_acc;
+reg    [CB:0] cpal_n = '0;           // codes in use in the frame being captured
+wire          cap_put;               // the code of the next pixel in raster order is ready
+wire [CB-1:0] cap_code;
 wire        cap_vbr = ce_pix && vblank_in && !old_vbl;
-wire        cap_wr  = rot ? (ce_pix && act_px && cap_i[2:0] == 3'd7) || (cap_vbr && cap_i[2:0] != 3'd0) : ce_pix && act_px;
-wire [39:0] gr_qw;
+wire        cap_wr  = rot ? (cap_put && cap_i[2:0] == 3'd7) || (cap_vbr && cap_i[2:0] != 3'd0) : ce_pix && act_px;
+wire [WW-1:0] gr_qw;
 reg  [13:0] gr_ra;
 reg   [2:0] gr_sub;                 // rotated: pixel within the word read
-dpram_dc #(.widthad_a(14), .width_a(40)) gring
+dpram_dc #(.widthad_a(14), .width_a(WW)) gring
 (
     .clock_a(clk), .address_a(rot ? {cap_buf, cap_i[15:3]} : {gy_w, gx_c[8:0]}),
-    .data_a(rot ? (act_px ? {cap_px, cap_acc[34:0]} : cap_acc) : {16'd0, rgb_in}), .wren_a(cap_wr), .q_a(),
-    .clock_b(clk), .address_b(gr_ra), .q_b(gr_qw)
+    .data_a(rot ? (cap_put ? {cap_code, cap_acc[WW-CB-1:0]} : cap_acc) : {{(WW-24){1'b0}}, rgb_in}), .wren_a(cap_wr), .q_a(),
+    .clock_b(clk), .address_b(gr_ra), .data_b('0), .wren_b(1'b0), .q_b(gr_qw)
 );
-reg         cp_rbuf;                 // buffer the compositor reads (the last whole frame)
-wire  [4:0] gr_code = gr_qw[5 * gr_sub +: 5];
-wire [23:0] gr_q  = rot ? cpal[{cp_rbuf, gr_code}] : gr_qw[23:0];
-always @(posedge clk) if (ce_pix) begin
-    if (act_px) begin
-        cap_acc[5 * cap_i[2:0] +: 5] <= cap_px; cap_i <= cap_i + 16'd1;
-        if (cpal_new) begin cpal[{cap_buf, cpal_n[4:0]}] <= rgb_in; cpal_n <= cpal_n + 6'd1; end
-    end
-    if (vblank_in && !old_vbl) begin cap_tot <= cap_i; cap_buf <= ~cap_buf; cap_i <= 16'd0; cpal_n <= 6'd0; end
+reg           cp_rbuf;               // buffer the compositor reads (the last whole frame)
+wire [CB-1:0] gr_code = gr_qw[CB * gr_sub +: CB];
+reg    [23:0] pal2;                  // colour of the stage-1 code, one clock later (compositor stage 2)
+always @(posedge clk) begin
+    if (cap_put) begin cap_acc[CB * cap_i[2:0] +: CB] <= cap_code; cap_i <= cap_i + 16'd1; end
+    if (cap_vbr) begin cap_tot <= cap_i; cap_buf <= ~cap_buf; cap_i <= 16'd0; end
 end
+
+generate if (CODE_BITS == 5) begin : map_cmp
+    reg  [23:0] cpal[64];            // colour of code n in buffer b: {b, n}
+    reg  [31:0] cpal_hit;
+    integer     ci;
+    always @* for (ci = 0; ci < 32; ci = ci + 1) cpal_hit[ci] = ci < cpal_n && cpal[{cap_buf, 5'(ci)}] == rgb_in;
+    reg   [4:0] hit_code;            // codes are unique, so at most one hit: OR of the hit indices
+    always @* begin
+        hit_code = 5'd0;
+        for (ci = 0; ci < 32; ci = ci + 1) if (cpal_hit[ci]) hit_code = hit_code | 5'(ci);
+    end
+    wire        cpal_new = cpal_hit == 32'd0 && !cpal_n[5];
+    assign cap_put  = ce_pix && act_px && rot;
+    assign cap_code = cpal_hit != 32'd0 ? hit_code : cpal_n[5] ? 5'd31 : cpal_n[4:0];
+    always @(posedge clk) begin
+        if (ce_pix && act_px && cpal_new) begin cpal[{cap_buf, cpal_n[4:0]}] <= rgb_in; cpal_n <= cpal_n + 6'd1; end
+        if (cap_vbr) cpal_n <= 6'd0;
+        pal2 <= cpal[{cp_rbuf, gr_code}];
+    end
+end else begin : map_hash
+    // table: 2^(CB+1) buckets of 4 slots (8 slots per code), all 4 compared at once; up to 3 buckets probed
+    localparam int HB = CB + 1, SW = CB + 25;   // bucket address bits, slot = {valid, RGB, code}
+    function [HB-1:0] hash(input [23:0] c);
+        reg [71:0] s; integer k;
+        begin s = {48'd0, c ^ {c[10:0], c[23:11]}}; hash = '0; for (k = 0; k < 24; k = k + HB) hash = hash ^ s[k +: HB]; end
+    endfunction
+    reg  [23:0] m_rgb;
+    reg [HB-1:0] m_h;
+    reg   [1:0] m_try;
+    reg   [1:0] m_st = 2'd0;         // 0 idle, 1 table read in flight, 2 compare
+    reg         m_put = 1'b0;
+    reg [CB-1:0] m_code;
+    reg [HB-1:0] t_wa, clr_a = '0;
+    reg [4*SW-1:0] t_wd;
+    reg         t_we = 1'b0, clr = 1'b1;
+    wire [4*SW-1:0] t_q;
+    dpram_dc #(.widthad_a(HB), .width_a(4 * SW)) ctab
+    (
+        .clock_a(clk), .address_a(clr ? clr_a : t_wa), .data_a(clr ? '0 : t_wd), .wren_a(clr | t_we), .q_a(),
+        .clock_b(clk), .address_b(m_h), .data_b('0), .wren_b(1'b0), .q_b(t_q)
+    );
+    reg   [3:0] s_hit, s_free;
+    reg [CB-1:0] s_code;             // code of the hit slot (slots hold unique colours: OR of the hits)
+    reg   [1:0] s_fi;                // first free slot
+    integer     si;
+    always @* begin
+        s_code = '0; s_fi = 2'd0;
+        for (si = 0; si < 4; si = si + 1) begin
+            s_hit[si]  = t_q[SW * si + SW - 1] && t_q[SW * si + CB +: 24] == m_rgb;
+            s_free[si] = !t_q[SW * si + SW - 1];
+            if (s_hit[si]) s_code = s_code | t_q[SW * si +: CB];
+        end
+        for (si = 3; si >= 0; si = si - 1) if (s_free[si]) s_fi = 2'(si);
+    end
+    reg         p_we = 1'b0;
+    reg [CB-1:0] p_wa;
+    wire [23:0] p_q;
+    dpram_dc #(.widthad_a(CB + 1), .width_a(24)) cpal
+    (
+        .clock_a(clk), .address_a({cap_buf, p_wa}), .data_a(m_rgb), .wren_a(p_we), .q_a(),
+        .clock_b(clk), .address_b({cp_rbuf, gr_code}), .data_b('0), .wren_b(1'b0), .q_b(p_q)
+    );
+    always @* pal2 = p_q;
+    assign cap_put  = m_put;
+    assign cap_code = m_code;
+    always @(posedge clk) begin
+        t_we <= 1'b0; p_we <= 1'b0; m_put <= 1'b0;
+        if (clr) begin clr_a <= clr_a + 1'd1; if (&clr_a) clr <= 1'b0; end
+        if (cap_vbr) begin clr <= 1'b1; clr_a <= '0; cpal_n <= '0; end   // a fresh code set every frame
+        case (m_st)
+            2'd0: if (ce_pix && act_px && rot) begin m_rgb <= rgb_in; m_h <= hash(rgb_in); m_try <= 2'd0; m_st <= 2'd1; end
+            2'd1: m_st <= 2'd2;      // slot m_h is read this clock
+            default: begin
+                m_st <= 2'd0;
+                if (s_hit != 4'd0) begin m_code <= s_code; m_put <= 1'b1; end
+                else if (s_free != 4'd0 || m_try == 2'd2) begin  // a free slot (or 3 full buckets): a new code, if any is left
+                    m_put <= 1'b1;
+                    if (s_free != 4'd0 && !cpal_n[CB]) begin
+                        m_code <= cpal_n[CB-1:0]; cpal_n <= cpal_n + 1'd1;
+                        t_wa <= m_h; t_wd <= t_q; t_wd[SW * s_fi +: SW] <= {1'b1, m_rgb, cpal_n[CB-1:0]}; t_we <= 1'b1;
+                        p_wa <= cpal_n[CB-1:0]; p_we <= 1'b1;
+                    end else m_code <= {CB{1'b1}};
+                end else begin m_h <= m_h + 1'd1; m_try <= m_try + 2'd1; m_st <= 2'd1; end
+            end
+        endcase
+    end
+end endgenerate
 
 wire [63:0] nb_q;
 reg   [8:0] nb_x;                   // prefetch: first column of the burst
@@ -514,7 +592,7 @@ reg         nb_half;
 dpram_dc #(.widthad_a(10), .width_a(64)) nbuf
 (
     .clock_a(clk), .address_a({nb_half, 9'(nb_x + {1'b0, ebeat})}), .data_a(DDRAM_DOUT), .wren_a(e_rd[0]), .q_a(),
-    .clock_b(clk), .address_b({vblank_in ? 1'b0 : gy_c[0], crt_flip ? 9'(v_nw - 12'd1 - {3'd0, gx_c}) : gx_c[8:0]}), .q_b(nb_q)
+    .clock_b(clk), .address_b({vblank_in ? 1'b0 : gy_c[0], crt_flip ? 9'(v_nw - 12'd1 - {3'd0, gx_c}) : gx_c[8:0]}), .data_b('0), .wren_b(1'b0), .q_b(nb_q)
 );
 
 reg  run = 1'b0;
@@ -600,11 +678,11 @@ reg [23:0] dv_rem;                   // per-row game line: (row offset * NH) / S
 reg  [8:0] dv_q;
 reg  [3:0] dv_b = 4'd0;
 reg [11:0] dv_o;
-reg  [6:0] cp_n, cp_i, cp_i1, cp_i2;
+reg  [6:0] cp_n, cp_i, cp_i1, cp_i2, cp_i3;
 reg  [6:0] cp_got;                   // S words of this chunk already in ccbuf (written the clock before)
-reg        cp_v1, cp_v2;
-reg [23:0] g2;                       // stage 2: game pixel and S word, registered (the colour-code lookup is slow)
-reg [63:0] cc2;
+reg        cp_v1, cp_v2, cp_v3;
+reg [23:0] g2, g3;                   // stage 2: raw ring pixel (pal2 = its code's colour); stage 3: game pixel
+reg [63:0] cc2, cc3;                 // S word, stages 2 / 3
 reg  [1:0] cp_buf;
 reg [31:0] cp_lo;
 wire [63:0] cc_q;
@@ -618,13 +696,13 @@ wire [11:0] fb_x   = fbf ? v_cw - cp_x - {5'd0, cp_n} : cp_x;
 dpram_dc #(.widthad_a(6), .width_a(64)) ccbuf
 (
     .clock_a(clk), .address_a(ebeat[5:0]), .data_a(DDRAM_DOUT), .wren_a(e_rd[1]), .q_a(),
-    .clock_b(clk), .address_b(cp_i[5:0]), .q_b(cc_q)
+    .clock_b(clk), .address_b(cp_i[5:0]), .data_b('0), .wren_b(1'b0), .q_b(cc_q)
 );
 wire [63:0] cw_q;
 dpram_dc #(.widthad_a(5), .width_a(64)) cwbuf
 (
     .clock_a(clk), .address_a(cw_a), .data_a(cw_d), .wren_a(cw_we), .q_a(),
-    .clock_b(clk), .address_b(wb_nxt[4:0]), .q_b(cw_q)
+    .clock_b(clk), .address_b(wb_nxt[4:0]), .data_b('0), .wren_b(1'b0), .q_b(cw_q)
 );
 assign k_wdata = cw_q;
 // rotated: frame index of the game pixel (picture unflipped; the board rotates it 180 for CRT Flip)
@@ -633,7 +711,7 @@ wire [15:0] cp_pf = crt_flip ? 16'(cap_tot - 16'd1 - cp_p[15:0]) : cp_p[15:0];
 always @* gr_ra = rot ? {cp_rbuf, cp_pf[15:3]} : {cp_k[4:0], crt_flip ? 9'(v_nw - 12'd1 - {3'd0, cp_gx}) : cp_gx[8:0]};
 always @(posedge clk) gr_sub <= cp_pf[2:0];
 
-wire [31:0] cpx = {8'd0, comp(g2[7:0], cc2[23:16], cc2[55:48]), comp(g2[15:8], cc2[15:8], cc2[47:40]), comp(g2[23:16], cc2[7:0], cc2[39:32])};
+wire [31:0] cpx = {8'd0, comp(g3[7:0], cc3[23:16], cc3[55:48]), comp(g3[15:8], cc3[15:8], cc3[47:40]), comp(g3[23:16], cc3[7:0], cc3[39:32])};
 
 always @(posedge clk) begin
     cw_we <= 1'b0;
@@ -690,13 +768,15 @@ always @(posedge clk) begin
             k_addr <= S_W + {6'd0, cp_row[10:0], 11'd0} + {17'd0, cp_x};
             k_len <= (cp_xend - cp_x > 12'd64) ? 8'd64 : 8'(cp_xend - cp_x);
             k_we <= 1'b0; k_req <= 1'b1;
-            cp_i <= 7'd0; cp_v1 <= 1'b0; cp_v2 <= 1'b0; cp_got <= 7'd0;
+            cp_i <= 7'd0; cp_v1 <= 1'b0; cp_v2 <= 1'b0; cp_v3 <= 1'b0; cp_got <= 7'd0;
             cst <= C_CALC;                 // compute while the burst arrives (40 MHz: a serial read-then-calc misses the raster)
         end
         C_CALC: begin
-            // address pixel cp_i (S word + game pixel) once its word has landed, register pixel cp_i1, compute pixel cp_i2
+            // address pixel cp_i (S word + game pixel) once its word has landed, register pixel cp_i1 (and read its code's
+            // colour), take the colour for pixel cp_i2, compute pixel cp_i3
             cp_v1 <= cp_i < cp_n && cp_i < cp_got; cp_i1 <= cp_i;
-            cp_v2 <= cp_v1; cp_i2 <= cp_i1; g2 <= in_rect ? gr_q : 24'd0; cc2 <= cc_q;
+            cp_v2 <= cp_v1; cp_i2 <= cp_i1; g2 <= gr_qw[23:0]; cc2 <= cc_q;
+            cp_v3 <= cp_v2; cp_i3 <= cp_i2; g3 <= !in_rect ? 24'd0 : rot ? pal2 : g2; cc3 <= cc2;
             if (cp_i < cp_n && cp_i < cp_got) begin
                 cp_i <= cp_i + 7'd1;
                 if (cp_hacc + {12'd0, v_gw} >= {12'd0, v_sw}) begin
@@ -705,13 +785,13 @@ always @(posedge clk) begin
                 end
                 else cp_hacc <= cp_hacc + {12'd0, v_gw};
             end
-            if (cp_v2) begin
-                if (!cp_i2[0]) cp_lo <= cpx;
+            if (cp_v3) begin
+                if (!cp_i3[0]) cp_lo <= cpx;
                 else begin                // framebuffer rotated 180: words in reverse order, pixels swapped
-                    cw_a <= fbf ? 5'(cp_n[6:1] - 6'd1 - {1'b0, cp_i2[5:1]}) : cp_i2[5:1];
+                    cw_a <= fbf ? 5'(cp_n[6:1] - 6'd1 - {1'b0, cp_i3[5:1]}) : cp_i3[5:1];
                     cw_d <= fbf ? {cp_lo, cpx} : {cpx, cp_lo}; cw_we <= 1'b1;
                 end
-                if (cp_i2 == cp_n - 7'd1) begin cp_buf <= 2'd0; cst <= C_WR; end
+                if (cp_i3 == cp_n - 7'd1) begin cp_buf <= 2'd0; cst <= C_WR; end
             end
         end
         C_WR: begin
