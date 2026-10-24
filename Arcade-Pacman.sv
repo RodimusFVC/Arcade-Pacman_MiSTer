@@ -44,7 +44,8 @@ wire        ioctl_upload_req;
 wire  [7:0] ioctl_din;
 wire        ioctl_wr;
 wire  [7:0] ioctl_index;
-wire [24:0] ioctl_addr;
+wire [26:0] ioctl_addr27;                     // hps_io's full address: the artwork download can pass 32 MB
+wire [24:0] ioctl_addr = ioctl_addr27[24:0];  // every other ioctl user
 wire  [7:0] ioctl_dout;
 wire [15:0] joystick_0, joystick_1;
 wire [15:0] joystick_l_analog_0;   // [15:8] Y, [7:0] X, signed
@@ -145,6 +146,7 @@ localparam CONF_STR = {
 	"H3P2O[53],Backdrop,On,Off;",
 	"H3P2O[54],Overlay,On,Off;",
 	"H3P2O[55],Bezel,On,Off;",
+	"H3P2O[58],Control Panel,On,Off;",
 	"H3P2O[56],Side Art,On,Off;",
 	"H3P2O[57],Zoom to Screen,Off,On;",
 	"-;",
@@ -182,7 +184,7 @@ hps_io #(.CONF_STR(CONF_STR)) hps_io
 	.ioctl_upload(ioctl_upload),
 	.ioctl_upload_req(ioctl_upload_req),
 	.ioctl_wr(ioctl_wr),
-	.ioctl_addr(ioctl_addr),
+	.ioctl_addr(ioctl_addr27),
 	.ioctl_dout(ioctl_dout),
 	.ioctl_din(ioctl_din),
 	.ioctl_index(ioctl_index),
@@ -433,10 +435,11 @@ wire        art_rd, art_we, art_clk;
 artwork #(.IDX(8'd5)) artwork
 (
 	.clk(CLK_49M),
-	.sel(status[52:49]), .layer_off(status[55:53]), .side_off(status[56]), .zoom(status[57]),
+	.sel(status[52:49]), .layer_off({status[58], status[55:53]}), .side_off(status[56]), .zoom(status[57]),
 	.crt_flip(status[22]), .hdmi_flip(status[11]), .turn(status[12]), .avail(art_avail),
+	.hdmi_w(HDMI_WIDTH), .hdmi_h(HDMI_HEIGHT),
 	.ioctl_download(ioctl_download), .ioctl_index(ioctl_index), .ioctl_wr(ioctl_wr),
-	.ioctl_addr(ioctl_addr), .ioctl_dout(ioctl_dout), .ioctl_wait(art_wait),
+	.ioctl_addr(ioctl_addr27), .ioctl_dout(ioctl_dout), .ioctl_wait(art_wait),
 	.ce_pix(ce_pix),
 	.hs_in(bd_hs), .vs_in(bd_vs), .hblank_in(bd_hbl), .vblank_in(bd_vbl), .rgb_in({bd_r, bd_g, bd_b}),
 	.hs_out(hs), .vs_out(vs), .hblank_out(hblank), .vblank_out(vblank), .rgb_out({r, g, b}),
