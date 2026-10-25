@@ -28,6 +28,7 @@ HISCORE_DAT = Path("/CybertronMD/Mame/plugins/hiscore/hiscore.dat")   # current 
 ART_DIR = Path(__file__).resolve().parent.parent / "games" / "mame-artwork"
 ART_SCREEN_W = 512          # canvas pixels across the game screen (HDMI framebuffer); 2x native fits the DDR budget
 ART_SCREEN_H = 512          # vertical games: canvas pixels down the (portrait) screen, same per-frame load as 512 across
+ART_MAX_W = 1400            # widest canvas line: the HDMI scaler fetches one per output line; >~1450 shimmers at 1080p (HW 2026-10-24)
 ART_BLOB_MAX = (1 << 26)    # PNG bytes + markers after the table: artwork.sv boff is 26 bits (64 MB DDR window)
 ART_ROT = {"ROT0": 0, "ROT270": 1, "ROT90": 2}   # layout table byte 10
 ART_NATIVE = (288, 224)     # every board's displayed raster (rtl/pacman_board.sv video_hblank / video_vblank)
@@ -724,12 +725,17 @@ def art_table(zipname, rot="ROT0", port_defaults=None):
                             it.find("orientation"), state_of(it, el) if el and el[0] == "img" else None))
         vert = rot != "ROT0"
         sc = ART_SCREEN_H / sb[3] if vert else ART_SCREEN_W / sb[2]
+        cap = ART_MAX_W / max(vb[2], vb[3])                 # height too: Orientation Horz turns it into the line width
+        if sc > cap:
+            gq = native[::-1] if vert else native
+            sc = max(cap, (gq[0] + 2) / sb[2], (gq[1] + 2) / sb[3])  # never below the game's native size + 2
+            print(f"artwork {zipname}: view {v.get('name')} shrunk to the {ART_MAX_W} px line cap (scale {sc:.3f})")
         cw, ch = (round(vb[2] * sc) + 1) & ~1, round(vb[3] * sc)
         ox = round((sb[0] - vb[0]) * sc) & 1        # shift the view so the screen starts on an even pixel
         oy = round((sb[1] - vb[1]) * sc) & 1        # and an even row (the view turned 90)
         sx = round((sb[0] - vb[0]) * sc) - ox
         sy = round((sb[1] - vb[1]) * sc) - oy
-        sw, sh = (round(sb[2] * sc / 2) * 2, ART_SCREEN_H) if vert else (ART_SCREEN_W, round(sb[3] * sc / 2) * 2)
+        sw, sh = round(sb[2] * sc / 2) * 2, round(sb[3] * sc / 2) * 2   # = (512 down / across) when not capped
         ch = (ch + 1) & ~1
         gw, gh = native[::-1] if vert else native        # game picture as the layout shows it
         assert cw <= 2048 and ch <= 2048 and sw >= gw and sh >= gh, v.get("name")

@@ -23,10 +23,13 @@ set_global_assignment -name QIP_FILE rtl/sound/jt89/syn/quartus/jt89_verilog.qip
 
 set_global_assignment -name VERILOG_FILE rtl/mister_custom/pause.v
 set_global_assignment -name VERILOG_FILE rtl/mister_custom/hiscore.v
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/mister_custom/controllers.sv
 
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/rom_loader.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/pacman_sdrom.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/sdram_phase_cal.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/sdram_phase_ctl.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/sdram.sv
-set_global_assignment -name VHDL_FILE rtl/ram_rom/dpram_dc.vhd
+# DPRAMSV-2026-10-25: VHDL dpram_dc replaced by the SystemVerilog one (same ports/generics + byteena); original:
+# set_global_assignment -name VHDL_FILE rtl/ram_rom/dpram_dc.vhd
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/dpram_dc.sv
