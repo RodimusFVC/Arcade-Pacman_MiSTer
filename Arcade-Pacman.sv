@@ -136,7 +136,7 @@ localparam CONF_STR = {
 	"P1O[44:41],V Position (CRT),0,+1,+2,+3,+4,+5,+6,+7,-8,-7,-6,-5,-4,-3,-2,-1;",
 	"P1OGI,Scandoubler Fx,None,HQ2x,CRT 25%,CRT 50%,CRT 75%;",
 	"-;",
-	"P2,Game Options;",
+	"H4P2,Game Options;",
 	"H1P2O[33:32],Trackball Speed,Normal,Fast,Slow;",
 	"H2P2O[36:34],SDRAM Read Latch,Auto,Normal,Early,Late,Later;",
 	"H2P2O[48:45],SDRAM Clk Phase,Auto,0.0ns,1.4ns,2.8ns,4.2ns,5.7ns,7.1ns,8.5ns,9.9ns,11.3ns,12.7ns,14.1ns,15.5ns,17.0ns,18.4ns,19.8ns;",
@@ -149,7 +149,7 @@ localparam CONF_STR = {
 	"H3P2O[58],Control Panel,On,Off;",
 	"H3P2O[56],Side Art,On,Off;",
 	"H3P2O[57],Zoom to Screen,Off,On;",
-	"-;",
+	"H4-;",
 	"P3,Pause Options;",
 	"P3OJ,Pause when OSD is open,On,Off;",
 	"P3OK,Dim video after 10s,On,Off;",
@@ -178,7 +178,7 @@ hps_io #(.CONF_STR(CONF_STR)) hps_io
 
 	.buttons(buttons),
 	.status(status),
-	.status_menumask({~art_avail, ~sdram_game, ~tb_game, direct_video}),
+	.status_menumask({~(art_avail | sdram_game | tb_game), ~art_avail, ~sdram_game, ~tb_game, direct_video}),   // H4: Game Options page empty
 
 	.ioctl_download(ioctl_download),
 	.ioctl_upload(ioctl_upload),
