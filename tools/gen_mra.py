@@ -17,6 +17,8 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "RodimusCoresMaster_MiSTer" / "tools"))
+import mra_tidy                                     # noqa: E402  fleet MRA comment format
 
 MAME_VERSION = "0289"
 RBF = "Pacman"
@@ -31,7 +33,7 @@ ART_SCREEN_H = 512          # vertical games: canvas pixels down the (portrait) 
 ART_MAX_W = 1400            # widest canvas line: the HDMI scaler fetches one per output line; >~1450 shimmers at 1080p (HW 2026-10-24)
 ART_BLOB_MAX = (1 << 26)    # PNG bytes + markers after the table: artwork.sv boff is 26 bits (64 MB DDR window)
 ART_ROT = {"ROT0": 0, "ROT270": 1, "ROT90": 2}   # layout table byte 10
-ART_NATIVE = (288, 224)     # every board's displayed raster (rtl/pacman_board.sv video_hblank / video_vblank)
+ART_NATIVE = (288, 224)     # every board's displayed raster (rtl/boards/pacman/pacman_board.sv video_hblank / video_vblank)
 ART_NATIVE_BY = {}
 # hiscore.v header after START_WAIT: CHECK_WAIT 00FF, CHECK_HOLD 2, WRITE_HOLD 2, WRITE_REPEATCOUNT 1,
 # WRITE_REPEATWAIT 1111, PAUSEPAD 0, CHANGEMASK 0
@@ -851,9 +853,9 @@ def mra(g, games, segs, build_inputs, with_art=False):
             (F_VERT if g["rot"] in ("ROT90", "ROT270") else 0) | \
             (F_ROT90 if g["rot"] == "ROT90" else 0)
     nbtn = max(buttons) if buttons else 0
-    names = ",".join([buttons.get(i, "Not Used") for i in range(1, 5)] + ["Coin", "Start 1P", "Start 2P", "Pause"] +
-                     [buttons.get(i, "Not Used") for i in (5, 6)] +
-                     ["Rack Test" if RACK_HOLD in imap or RACK_TOGGLE in imap else "Not Used"])
+    names = ",".join([buttons.get(i, "-") for i in range(1, 5)] + ["Coin", "Start 1P", "Start 2P", "Pause"] +
+                     [buttons.get(i, "-") for i in (5, 6)] +
+                     ["Rack Test" if RACK_HOLD in imap or RACK_TOGGLE in imap else "-"])
     parent = g["parent"] or g["name"]
     zipname = HBMAME_ZIP.get(g["name"], f'{g["name"]}.zip') + (f'|{g["parent"]}.zip' if g["parent"] else "")
     rotation = {"ROT0": "horizontal", "ROT270": "vertical (ccw)", "ROT90": "vertical (cw)"}[g["rot"]]
@@ -918,7 +920,7 @@ def mra(g, games, segs, build_inputs, with_art=False):
     <joystick>{"2-way" if twoway else "4-way" if fourway else "8-way"}</joystick>
     <special_controls>{"trackball" if any(24 <= i < 32 for i in imap) else ""}</special_controls>
     <num_buttons>{nbtn}</num_buttons>
-    <buttons names="{names}" default="A,B,X,Y,Select,Start,R,L"/>
+    <buttons names="{names}" default="{mra_tidy.button_defaults(names)}"/>
 
     <switches default="{",".join(f"{b:02X}" for b in idle)}">
 {dip_lines}
@@ -995,7 +997,7 @@ def main():
         for root, with_art in [(out_dir, False)] + ([(out_dir / "_artwork", True)] if art_zip(g, games) else []):
             path = out_path(root, g, games)
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(mra(g, games, segs, build_inputs, with_art))
+            path.write_text(mra_tidy.tidy(mra(g, games, segs, build_inputs, with_art)))
             print(f'{name:12s} {path.relative_to(out_dir)}')
 
 

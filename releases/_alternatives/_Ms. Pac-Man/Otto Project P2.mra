@@ -25,7 +25,7 @@
     <joystick>4-way</joystick>
     <special_controls></special_controls>
     <num_buttons>0</num_buttons>
-    <buttons names="Not Used,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Rack Test" default="A,B,X,Y,Select,Start,R,L"/>
+    <buttons names="-,-,-,-,Coin,Start 1P,Start 2P,Pause,-,-,Rack Test" default="Select,Start,R,L"/>
 
     <switches default="FF,FF,C9,00">
         <dip name="Rack Test (Cheat)" bits="4" ids="Off,On" values="1,0"/>
@@ -37,7 +37,7 @@
         <dip name="Difficulty" bits="22" ids="Normal,Hard" values="1,0"/>
     </switches>
 
-    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <!-- Index 0: ROM -->
     <rom index="0" md5="none" zip="hbmspacman.zip|mspacman.zip">
         <part crc="a9c0c5fc" name="ottop2.1"/>
         <part crc="f6c05582" name="ottop1.2"/>
@@ -56,7 +56,7 @@
         <part crc="a9cc86bf" name="82s126.1m"/>
     </rom>
 
-    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <!-- Index 1: Config -->
     <rom index="1">
         <part>
             04 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -65,7 +65,7 @@
         </part>
     </rom>
 
-    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <!-- Index 3: Hiscore -->
     <rom index="3" md5="none">
         <part>
             00 4A 3E C4 00 FF 00 02 00 02 00 01 11 11 00 00
@@ -74,6 +74,7 @@
             00 00 43 D1 00 01 48 48
         </part>
     </rom>
+    <!-- Index 4: NVRAM -->
     <rom index="4"></rom>
     <nvram index="4" size="11"></nvram>
 

@@ -2,7 +2,7 @@
 //
 //  Sega 315-5007 encrypted Z80 (Pengo 315-5007 sets) - opcode/data decryption
 //
-//  Port of MAME pengo.cpp decode_pengo6 (BSD-3-Clause; Nicola Salmoria).
+// Based on MAME pengo.cpp (Nicola Salmoria, BSD-3-Clause)
 //
 //    j    = {D5,D3,D1}, mirrored when D7 set
 //    data = src ^ data_xor[A0][j]

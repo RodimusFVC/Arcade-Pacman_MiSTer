@@ -25,7 +25,7 @@
     <joystick>8-way</joystick>
     <special_controls></special_controls>
     <num_buttons>1</num_buttons>
-    <buttons names="Fire,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,B,X,Y,Select,Start,R,L"/>
+    <buttons names="Fire,-,-,-,Coin,Start 1P,Start 2P,Pause,-,-,-" default="A,Select,Start,R,L"/>
 
     <switches default="FF,FF,DD,00">
         <dip name="Unknown" bits="4" ids="Off,On" values="1,0"/>
@@ -40,7 +40,7 @@
         <dip name="Unknown" bits="23" ids="Off,On" values="1,0"/>
     </switches>
 
-    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <!-- Index 0: ROM -->
     <rom index="0" md5="none" zip="jumpshotp.zip|jumpshot.zip">
         <part crc="acc5e15e" name="js6e.bin"/>
         <part crc="62b48ba4" name="js6f.bin"/>
@@ -56,7 +56,7 @@
         <part crc="a9cc86bf" name="82s126.1m"/>
     </rom>
 
-    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <!-- Index 1: Config -->
     <rom index="1">
         <part>
             00 90 03 00 00 00 00 00 00 00 00 00 00 00 00 00

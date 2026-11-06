@@ -3,23 +3,23 @@
 //  controllers.sv - shared MiSTer input library (fleet master copy; copy unchanged, md5-check before overwrite)
 //  Copyright (C) 2026 Rodimus
 //
-//  Combined from the fleet's own input logic (audit 2026-10-24). Each module is self-contained; a core
+// Each module is self-contained; a core
 //  instantiates only what its games need and configures it per game by parameters / MRA bytes / OSD bits.
 //
-//    ctl_keyboard      PS/2 keyboard -> MAME default keys (13 keys) + a per-core extra-key table
+//    ctl_keyboard      PS/2 keyboard -> default keys (13 keys) + a per-core extra-key table
 //    ctl_mouse         hps_io ps2_mouse -> event strobe, signed dx (right +) / dy (down +), buttons
 //    ctl_tick          frame strobe (vblank rising edge) or divider strobe; both stop while paused
 //    ctl_joy4way       4-way restriction, most recently pressed direction wins
 //    ctl_stick_dirs    analog stick -> {U, D, L, R} (per-axis threshold = 8-way, or dominant axis = 4-way)
-//    ctl_coin_impulse  MAME PORT_IMPULSE(n): a coin press held for exactly n frames from the next vblank
-//    ctl_toggle        MAME PORT_TOGGLE: flips on each press (Rack Test, gear shifters)
+//    ctl_coin_impulse  PORT_IMPULSE(n): a coin press held for exactly n frames from the next vblank
+//    ctl_toggle        PORT_TOGGLE: flips on each press (Rack Test, gear shifters)
 //    ctl_ids           common control-id vector 0-35 for the MRA input map (pads never linked)
 //    ctl_port_map      MRA input map -> game input ports (idle level ^ control, DIP bits, analog overlay)
 //    ctl_quad_decoder  quadrature A/B (SNAC trackball) -> count strobe + direction
 //    ctl_trackball     2-axis relative counter: trackball / dial / spinner (mouse, spinner, SNAC, stick, D-pad)
 //    ctl_paddle        absolute paddle position in [PMIN, PMAX] (paddle, spinner, mouse, stick, D-pad)
-//    ctl_dial_mame     MAME IPT_DIAL / IPT_TRACKBALL counter with MAME sensitivity / key delta / wheel mode
-//    ctl_ad_stick      MAME IPT_AD_STICK absolute axis (rest / min / max, D-pad ramp with autocentre)
+//    ctl_dial_mame     IPT_DIAL / IPT_TRACKBALL counter with sensitivity / key delta / wheel mode
+//    ctl_ad_stick      IPT_AD_STICK absolute axis (rest / min / max, D-pad ramp with autocentre)
 //    ctl_steer         steering counter slewed one count per tick (absolute wheel / paddle, relative spinner)
 //    ctl_pedal         accelerator / brake level: digital ramp per frame or one analog stick axis
 //    ctl_gun_cursor    light-gun crosshair moved by mouse / stick / D-pad, clamped to the picture
@@ -28,14 +28,18 @@
 //  9 Start 1P, 10 Start 2P, 11 Pause, 12-13 Btn 5-6. Analog sticks are {Y, X}, signed, up / left negative.
 //  Rules: pads are never linked (player 2's Start = Start 2P only); a user's spelled-out layout is final.
 //
-//  v2 (2026-10-25). Backward compatible: a v1 instantiation behaves bit-identically. New behaviour comes only from new
-//  parameters (defaults = v1) and new ports declared tri0 (an unconnected tri0 input reads 0 = v1).
+// Optional features: new behaviour comes only from new
+// parameters (defaults = plain behaviour) and new ports declared tri0 (an unconnected tri0 input reads 0).
 //    ctl_keyboard   STD_EXT (extended-bit rule for the 13 keys), extra-key table NX / NXO / XKEYS / XINIT -> kbx, pause
 //    ctl_port_map   BASE_MODE 1 / 2: per-port DIP byte select (port_sel) and per-bit DIP bit map (dip_bit) from dip_bytes
 //    ctl_ids        BTN56 = 0 leaves ids 32-35 at 0
 //    ctl_toggle     pause input; ctl_coin_impulse / ctl_paddle / ctl_pedal: PAUSE_MODE
-//  The v2 settings that absorb the cores' remaining local blocks (keyboard tables, port builders, pause forms) are
-//  in verilator/controllers/lint_cfg.sv, each proven against the core's own block by tb_keyboard_v2 / tb_port_map_v2.
+//    ctl_ad_stick   HOLD = 1: a released D-pad / button keeps the offset (e.g. a throttle)
+//    ctl_steer      RATE = 1: mode 1 analog stick / wheel X = turning SPEED (an absolute axis on a relative
+//                   IPT_DIAL port adds its value every frame); full lock = the D-pad rate x Sensitivity
+//    ctl_paddle     axis_v = 1: the paddle moves vertically on screen (stick Y, D-pad up / down, mouse Y drive it);
+//                   rot = the game's orientation: adds the geometric reverse when the paddle value follows the
+//                   native raster axis (ROT90: horizontal paddles, ROT270: vertical, ROT180: both).
 //
 //  PAUSE. Every module with a counter, ramp, timer or latch takes `pause` (connect the core's pause_cpu; tie 0 or leave
 //  it unconnected to ignore pause). The v2 rule, with pause connected (and PAUSE_MODE = 1 where the module has it):
@@ -68,9 +72,9 @@
 
 
 //----------------------------------------------------------------------------
-// ctl_keyboard: MAME default keys from hps_io ps2_key (template cores' block).
+// ctl_keyboard: default keys from hps_io ps2_key (template cores' block).
 // hps_io packs ps2_key = {toggle, pressed, extended, code}: bit 9 is 1 while the key is DOWN
-// (21 fleet cores use ~ps2_key[9] for these active-high regs = inverted keys, 2026-10-24; fixed here).
+// Use ps2_key[9] directly for active-high regs; ~ps2_key[9] inverts the keys.
 // kb: [0] up [1] down [2] left [3] right [4] Btn 1 (Ctrl) [5] Btn 2 (Alt) [6] Start 1 (1) [7] Start 2 (2)
 //     [8] Coin 1 (5) [9] Coin 2 (6) [10] Service (9) [11] Tilt (T) [12] Pause (P)
 // STD_EXT (extended bit ps2_key[8] for the 13 keys): 0 = ignored (v1: right Ctrl / Alt also press Btn 1 / 2, keypad
@@ -218,8 +222,8 @@ endmodule
 
 
 //----------------------------------------------------------------------------
-// ctl_joy4way: 4-way joystick, the most recently pressed direction wins (from the MiSTer Pac-Man port;
-// byte-identical in 12 fleet cores). en = 0 passes the input through (one clock late). in / out {U, D, L, R}.
+// ctl_joy4way: 4-way joystick, the most recently pressed direction wins.
+// en = 0 passes the input through (one clock late). in / out {U, D, L, R}.
 //----------------------------------------------------------------------------
 module ctl_joy4way
 (
@@ -282,7 +286,7 @@ endmodule
 
 
 //----------------------------------------------------------------------------
-// ctl_coin_impulse: MAME PORT_IMPULSE(FRAMES) (Galaga-family block). A press is latched, then the coin is
+// ctl_coin_impulse: PORT_IMPULSE(FRAMES) (Galaga-family block). A press is latched, then the coin is
 // held for exactly FRAMES frames from the next vblank. en = 0 passes coin_raw through.
 // Pause: the frame count holds (an active pulse stays up and finishes after resume). A press made while paused:
 //   PAUSE_MODE 0 (v1) latches it and the pulse starts at the first vblank after resume; PAUSE_MODE 1 discards it (a
@@ -319,7 +323,7 @@ endmodule
 
 
 //----------------------------------------------------------------------------
-// ctl_toggle: MAME PORT_TOGGLE - q flips on each rising edge of btn; clear (e.g. ioctl_download) zeroes it.
+// ctl_toggle: PORT_TOGGLE - q flips on each rising edge of btn; clear (e.g. ioctl_download) zeroes it.
 // Pause (port is v2-only; unconnected = v1): a press while paused is ignored; btn keeps being tracked, so a button
 // still held at resume does not flip q either. clear works while paused.
 //----------------------------------------------------------------------------
@@ -485,8 +489,7 @@ endmodule
 //   quad    : +/-(1 << unit_sh) per quad_ce (native counter direction; rev does not apply)
 //   rev[n]  : negates the mouse / spinner / tick delta of axis n
 // Output = counter >> (base_sh + 1 if speed = 2 Slow, - 1 if speed = 1 Fast), low OUT_W bits.
-// dir[n] = sign of the last change of output n (Atari trackball DIR flip-flop / MAME read_trackball).
-// Per-core settings that reproduce the old logic: see verilator/controllers/tb_trackball.sv.
+// dir[n] = sign of the last change of output n (Atari trackball DIR flip-flop).
 // Pause: counters hold; motion from every source (mouse, spinner, quadrature, tick) arriving while paused is
 // discarded; dir holds. Same in v1.
 //----------------------------------------------------------------------------
@@ -598,7 +601,7 @@ endmodule
 
 
 //----------------------------------------------------------------------------
-// ctl_paddle: absolute paddle position in [PMIN, PMAX] (MAME IPT_PADDLE). From Exidy's exidy_paddle, the
+// ctl_paddle: absolute paddle position in [PMIN, PMAX] (IPT_PADDLE). From Exidy's exidy_paddle, the
 // parameterised form of Centipede's paddle_ctl (Warlords: PMIN 1D, PMAX CB, PCEN 80).
 //   paddle (hps_io paddle_N): absolute, the position follows the knob over the full range
 //   spinner and mouse X: relative, half a count per count at 1.0x; stick X: up to 8 counts per tick,
@@ -625,11 +628,27 @@ module ctl_paddle #(parameter [7:0] PMIN = 8'h1D, parameter [7:0] PMAX = 8'hCB, 
     input       [7:0] stick_x,        // signed
     input             left,
     input             right,
+    // v5 (unconnected = v4): screen axis and game orientation
+    input  tri0       axis_v,         // 1 = the paddle moves vertically on screen: the next three replace stick_x /
+    input  tri0 [7:0] stick_y,        //     left / right / mouse_dx (down = increase, stick Y signed, down +)
+    input  tri0       up,
+    input  tri0       down,
+    input  tri0 [9:0] mouse_dy,       //     (ctl_mouse dy: down +)
+    input  tri0 [1:0] rot,            // 0 ROT0, 1 ROT90, 2 ROT180, 3 ROT270 (the paddle value follows the native axis)
 
     output      [7:0] pos
 );
 
 localparam [10:0] LO = {PMIN, 3'd0}, HI = {PMAX, 3'd0}, MID = {PCEN, 3'd0};
+
+// v5: the axis the player sees, and the reverse the rotation adds (CW: screen x = H - 1 - native y; CCW: screen
+// y = W - 1 - native x; 180: both)
+wire       geo_rev = axis_v ? (rot == 2'd3 || rot == 2'd2) : (rot == 2'd1 || rot == 2'd2);
+wire       rev     = reverse ^ geo_rev;
+wire [7:0] stk     = axis_v ? stick_y : stick_x;
+wire       dec     = axis_v ? up : left;
+wire       inc     = axis_v ? down : right;
+wire [9:0] mdx     = axis_v ? mouse_dy : mouse_dx;
 localparam [15:0] SPAN = {8'd0, PMAX - PMIN};
 
 // value * sensitivity in 1/8 counts
@@ -655,18 +674,18 @@ reg  [7:0] pad_d = 8'h80;
 reg [10:0] posq = MID;                               // position in 1/8 counts
 
 wire signed [9:0] spin_d  = (spinner[8] != spin_seen) ? $signed({{2{spinner[7]}}, spinner[7:0]}) : 10'sd0;
-wire signed [9:0] mouse_d = mouse_ev ? $signed(mouse_dx) : 10'sd0;
-wire signed [7:0] sx      = stick_x;
+wire signed [9:0] mouse_d = mouse_ev ? $signed(mdx) : 10'sd0;
+wire signed [7:0] sx      = stk;
 wire signed [9:0] sx_e    = {{2{sx[7]}}, sx};
-wire signed [9:0] frame_d = (sx > 8'sd12 || sx < -8'sd12) ? (sx_e >>> 4) : right ? 10'sd5 : left ? -10'sd5 : 10'sd0;
+wire signed [9:0] frame_d = (sx > 8'sd12 || sx < -8'sd12) ? (sx_e >>> 4) : inc ? 10'sd5 : dec ? -10'sd5 : 10'sd0;
 
 wire signed [15:0] d_q3 = (scale_q3(spin_d, sensitivity) >>> 1) + (scale_q3(mouse_d, sensitivity) >>> 1) +
                           (tick ? scale_q3(frame_d, sensitivity) : 16'sd0);
-wire signed [15:0] nxt  = $signed({5'd0, posq}) + (reverse ? -d_q3 : d_q3);
+wire signed [15:0] nxt  = $signed({5'd0, posq}) + (rev ? -d_q3 : d_q3);
 
 // absolute knob: 00-FF -> PMIN-PMAX
 /* verilator lint_off UNUSED */
-wire [15:0] knob  = {8'd0, reverse ? ~paddle : paddle} * SPAN;   // high byte used
+wire [15:0] knob  = {8'd0, rev ? ~paddle : paddle} * SPAN;   // high byte used
 /* verilator lint_on UNUSED */
 wire [10:0] abs_q = {(PMIN + knob[15:8]), 3'd0};
 
@@ -687,12 +706,12 @@ endmodule
 
 
 //----------------------------------------------------------------------------
-// ctl_dial_mame: MAME IPT_DIAL / IPT_TRACKBALL axis, a free-running 8-bit counter (MCR mcr_dial, itself from
-// Pole Position's pp_steering). MAME ioport analog_field units, sensitivity s = sens * 100 / 128 %:
+// ctl_dial_mame: IPT_DIAL / IPT_TRACKBALL axis, a free-running 8-bit counter (MCR mcr_dial, itself from
+// Pole Position's pp_steering). ioport analog_field units, sensitivity s = sens * 100 / 128 %:
 //   mouse s / 100 counts per count; spinner twice the mouse; held key keydelta * s / 100 counts per frame;
 //   stick (rate) 16 * s / 100 counts per frame at full deflection; stick (wheel) / paddle: the counter tracks
 //   the device, s / 100 counts per unit (+-128 units). OSD sensitivity / direction as Pole Position.
-// sens = MAME sensitivity * 128 / 100, keyd = MAME key delta (MRA bytes). 3-stage pipeline.
+// sens = sensitivity * 128 / 100, keyd = key delta (MRA bytes). 3-stage pipeline.
 // Pause: the counter holds; all motion arriving while paused is discarded, including wheel / paddle movement (their
 //   last-value registers keep tracking, so nothing jumps on resume) and deltas still in the pipeline. Same in v1.
 //----------------------------------------------------------------------------
@@ -701,10 +720,10 @@ module ctl_dial_mame
     input             clk,
     input             reset,
     input  tri0       pause,
-    input             frame,          // once per MAME frame
+    input             frame,          // once per frame
     input       [7:0] sens,
     input       [7:0] keyd,
-    input             reverse,        // MAME PORT_REVERSE ^ OSD direction
+    input             reverse,        // PORT_REVERSE ^ OSD direction
     input       [2:0] osd_sens,       // 1.0 .75 .5 .25 .125 1.25 1.5 2.0 x
     input             wheel,          // analog stick is a wheel (absolute) instead of a rate
 
@@ -778,14 +797,17 @@ endmodule
 
 
 //----------------------------------------------------------------------------
-// ctl_ad_stick: MAME IPT_AD_STICK absolute axis (MCR mcr_inputs). val = rest + stick * (hi - rest) / 128
+// ctl_ad_stick: IPT_AD_STICK absolute axis (MCR mcr_inputs). val = rest + stick * (hi - rest) / 128
 // (or * (rest - lo) / 128 below the rest value), clamped to [lo, hi]. While the stick is inside +/-DZ a held
 // D-pad moves an offset keyd per tick (frame) towards the end, and back to rest when released (autocentre).
 // Stick axis signed, + = right / down; inc = right / down, dec = left / up.
 // Pause: the D-pad offset (ramp and autocentre) freezes and continues on resume, so a D-pad released while paused
 //   recentres after resume; val keeps following the stick (level state). Same in v1.
+// HOLD (v3, default 0 = v2): 1 = no autocentre, a released D-pad / button leaves the offset where it is
+//   (e.g.Star Fire's throttle). The stick stays absolute: while it is outside +/-DZ it sets val
+//   and the offset returns to 0, as with HOLD = 0.
 //----------------------------------------------------------------------------
-module ctl_ad_stick #(parameter [6:0] DZ = 7'd4)
+module ctl_ad_stick #(parameter [6:0] DZ = 7'd4, parameter bit HOLD = 1'b0)
 (
     input        clk,
     input        reset,
@@ -819,7 +841,8 @@ function automatic signed [8:0] ramp(input signed [8:0] v, input up, input dn, i
     begin
         w  = {{2{v[8]}}, v};
         kk = $signed({3'd0, k});
-        n  = (up && !dn) ? w + kk : (dn && !up) ? w - kk : (w > kk) ? w - kk : (w < -kk) ? w + kk : 11'sd0;
+        n  = (up && !dn) ? w + kk : (dn && !up) ? w - kk : HOLD ? w :
+             (w > kk) ? w - kk : (w < -kk) ? w + kk : 11'sd0;
         ramp = (n > 11'sd128) ? 9'sd128 : (n < -11'sd128) ? -9'sd128 : n[8:0];
     end
 endfunction
@@ -839,16 +862,20 @@ endmodule
 
 
 //----------------------------------------------------------------------------
-// ctl_steer: steering counter (Pole Position pp_steering; MAME IPT_DIAL turned into ticks by a custom chip).
+// ctl_steer: steering counter (Pole Position pp_steering; IPT_DIAL turned into ticks by a custom chip).
 // Spinner (1 count per count) and mouse X (half) are relative; mode 1 analog stick X / mode 2 paddle are
 // ABSOLUTE (the counter tracks the device, +-64 counts at full lock); mode 0 D-pad ramps 750 counts / s.
 // All feed one pending accumulator that moves steer_pos at most one count per tick (clk / 16384), so a
 // signed 8-bit delta read by the game never aliases. Sensitivity / direction as ctl_paddle.
+// RATE (v4, default 0 = v3): 1 = mode 1 stick X is a rate, not a position: each tick adds the dead-zoned deflection
+//   x Sensitivity, full lock = the D-pad ramp (2/8 count per tick at 1.0x), the fraction carried in rate_frac. A
+//   held stick keeps turning, as a dial fed by a stick does; with RATE = 0 a held stick moves +-64 counts once.
+//   Paddle (mode 2) stays absolute.
 // Pause: steer_pos, the backlog and the tick divider hold; spinner / mouse / D-pad / wheel / paddle motion arriving
 //   while paused is discarded (the absolute target keeps tracking, so nothing jumps on resume); a backlog from before
 //   the pause keeps slewing after it. Same in v1.
 //----------------------------------------------------------------------------
-module ctl_steer
+module ctl_steer #(parameter bit RATE = 1'b0)
 (
     input        clk,
     input        reset,
@@ -896,7 +923,7 @@ wire signed [8:0] ana_raw = $signed({analog_x[7], analog_x});
 wire signed [8:0] pad_raw = $signed({1'b0, paddle}) - 9'sd128;
 wire signed [8:0] abs_raw = (mode == 2'd2) ? pad_raw :
                             ((ana_raw > 9'sd6) || (ana_raw < -9'sd6)) ? ana_raw : 9'sd0;
-wire              abs_on  = (mode == 2'd1) || (mode == 2'd2);
+wire              abs_on  = (mode == 2'd1 && !RATE) || (mode == 2'd2);
 wire signed [15:0] abs_tgt = abs_on ? (scale_q3({abs_raw[8], abs_raw}, sensitivity) >>> 1) : 16'sd0;
 reg  signed [15:0] abs_last = 16'sd0;
 
@@ -904,7 +931,11 @@ wire signed [15:0] pad_step = (mode == 2'd0 && (left ^ right)) ? (right ? 16'sd2
 
 wire signed [15:0] rel_q3  = scale_q3(spin_d, sensitivity) + (scale_q3(mouse_d, sensitivity) >>> 1);
 wire signed [15:0] abs_d   = abs_tgt - abs_last;
-wire signed [15:0] in_q3   = rel_q3 + (tick ? pad_step : 16'sd0) + abs_d;
+reg  signed [15:0] rate_frac = 16'sd0;                // RATE: Q3 x 512 residue of the stick rate
+wire signed [15:0] rate_in  = (RATE && mode == 2'd1) ? scale_q3({abs_raw[8], abs_raw}, sensitivity) : 16'sd0;
+wire signed [15:0] rate_sum = rate_frac + rate_in;
+wire signed [15:0] rate_q3  = rate_sum >>> 9;        // +-2 Q3 per tick at full lock, 1.0x
+wire signed [15:0] in_q3   = rel_q3 + (tick ? pad_step + rate_q3 : 16'sd0) + abs_d;
 wire signed [15:0] dir_q3  = reverse ? -in_q3 : in_q3;
 
 reg  signed [15:0] pending = 16'sd0;
@@ -913,6 +944,9 @@ localparam signed [15:0] PEND_MAX = 16'sd2048;        // +-256 counts backlog
 
 reg  [1:0] mode_q = 2'd0;
 reg        rev_q  = 1'b0;
+always @(posedge clk)
+    if (reset || mode != mode_q || reverse != rev_q) rate_frac <= 16'sd0;
+    else if (tick) rate_frac <= rate_sum - (rate_q3 <<< 9);
 
 always @(posedge clk) begin
     spin_seen <= spinner[8];
@@ -947,7 +981,7 @@ endmodule
 
 //----------------------------------------------------------------------------
 // ctl_pedal: accelerator and brake levels 0..FULL (Pole Position). A held button ramps its pedal +RAMP per
-// tick (frame) to FULL (MAME keyboard pedal), released = 0. With analog_en one stick axis drives both:
+// tick (frame) to FULL (keyboard pedal), released = 0. With analog_en one stick axis drives both:
 // up = accelerator, down = brake, |axis| * FULL / 128 with a +-DZ dead zone. A held button wins.
 // Pause: the ramps freeze (a held pedal keeps its level and continues ramping after resume); the analog level follows
 //   the stick. A button released while paused: PAUSE_MODE 1 clears its ramp at once (a press again before resume

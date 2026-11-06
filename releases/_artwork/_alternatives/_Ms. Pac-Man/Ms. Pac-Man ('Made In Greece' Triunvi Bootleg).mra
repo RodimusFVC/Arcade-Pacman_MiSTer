@@ -25,7 +25,7 @@
     <joystick>4-way</joystick>
     <special_controls></special_controls>
     <num_buttons>0</num_buttons>
-    <buttons names="Not Used,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Rack Test" default="A,B,X,Y,Select,Start,R,L"/>
+    <buttons names="-,-,-,-,Coin,Start 1P,Start 2P,Pause,-,-,Rack Test" default="Select,Start,R,L"/>
 
     <switches default="FF,FF,C9,00">
         <dip name="Rack Test (Cheat)" bits="4" ids="Off,On" values="1,0"/>
@@ -37,7 +37,7 @@
         <dip name="Difficulty" bits="22" ids="Normal,Hard" values="1,0"/>
     </switches>
 
-    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <!-- Index 0: ROM -->
     <rom index="0" md5="none" zip="mspacmanblt4.zip|mspacman.zip">
         <part crc="24edc6b7" name="11.g5" offset="0x0" length="0x4000"/>
         <part repeat="0x4000">00</part>
@@ -54,7 +54,7 @@
         <part crc="a9cc86bf" name="82s129-1.a9"/>
     </rom>
 
-    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <!-- Index 1: Config -->
     <rom index="1">
         <part>
             04 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -63,8 +63,7 @@
         </part>
     </rom>
 
-    <!-- Index 5: MAME artwork, layout table (from default.lay) + PNGs from the artwork zip, as-is -->
-    <!-- OSD Artwork: View 1 = Upright Artwork, View 2 = Cabaret Artwork, View 3 = Cocktail Artwork, View 4 = XBLA Artwork, View 5 = XBLA Artwork 4:3, View 6 = NM Artwork, View 7 = Hausjam Artwork -->
+    <!-- Index 5: Artwork -->
     <rom index="5" md5="none" zip="/mame-artwork/mspacman.zip">
         <part>
             41 57 07 00 09 00 20 01 E0 00 02 00 00 00 00 00 14 03 D2 02 C8 00 78 00 80 01 00 02 00 56 01 00

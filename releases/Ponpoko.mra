@@ -25,7 +25,7 @@
     <joystick>4-way</joystick>
     <special_controls></special_controls>
     <num_buttons>1</num_buttons>
-    <buttons names="Fire,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,B,X,Y,Select,Start,R,L"/>
+    <buttons names="Fire,-,-,-,Coin,Start 1P,Start 2P,Pause,-,-,-" default="A,Select,Start,R,L"/>
 
     <switches default="E0,00,E1,B1">
         <dip name="Bonus Life" bits="16,17" ids="10000,30000,50000,None" values="1,2,3,0"/>
@@ -40,7 +40,7 @@
         <dip name="Unknown" bits="31" ids="Off,On" values="1,0"/>
     </switches>
 
-    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <!-- Index 0: ROM -->
     <rom index="0" md5="none" zip="ponpoko.zip">
         <part crc="ffa3c004" name="ppokoj1.bin"/>
         <part crc="4a496866" name="ppokoj2.bin"/>
@@ -61,7 +61,7 @@
         <part crc="a9cc86bf" name="82s126.1m"/>
     </rom>
 
-    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <!-- Index 1: Config -->
     <rom index="1">
         <part>
             04 03 00 02 00 00 00 00 00 00 00 00 00 00 00 00
@@ -70,7 +70,7 @@
         </part>
     </rom>
 
-    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <!-- Index 3: Hiscore -->
     <rom index="3" md5="none">
         <part>
             16 6D A0 76 00 FF 00 02 00 02 00 01 11 11 00 00
@@ -80,6 +80,7 @@
             00 00 4C 53 00 01 02 02
         </part>
     </rom>
+    <!-- Index 4: NVRAM -->
     <rom index="4"></rom>
     <nvram index="4" size="29"></nvram>
 

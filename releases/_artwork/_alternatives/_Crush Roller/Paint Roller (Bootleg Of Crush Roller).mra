@@ -25,7 +25,7 @@
     <joystick>4-way</joystick>
     <special_controls></special_controls>
     <num_buttons>0</num_buttons>
-    <buttons names="Not Used,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,B,X,Y,Select,Start,R,L"/>
+    <buttons names="-,-,-,-,Coin,Start 1P,Start 2P,Pause,-,-,-" default="Select,Start,R,L"/>
 
     <switches default="EF,6F,31,00">
         <dip name="Cabinet" bits="4" ids="Upright,Cocktail"/>
@@ -35,7 +35,7 @@
         <dip name="Unknown" bits="21" ids="Off,On" values="1,0"/>
     </switches>
 
-    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <!-- Index 0: ROM -->
     <rom index="0" md5="none" zip="paintrlr.zip|crush.zip">
         <part crc="556d20b5" name="paintrlr.1"/>
         <part crc="4598a965" name="paintrlr.5"/>
@@ -57,7 +57,7 @@
         <part crc="a9cc86bf" name="82s126.1m"/>
     </rom>
 
-    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <!-- Index 1: Config -->
     <rom index="1">
         <part>
             00 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -66,7 +66,7 @@
         </part>
     </rom>
 
-    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <!-- Index 3: Hiscore -->
     <rom index="3" md5="none">
         <part>
             11 98 35 0D 00 FF 00 02 00 02 00 01 11 11 00 00
@@ -74,11 +74,11 @@
             00 00 4C 80 00 03 00 00
         </part>
     </rom>
+    <!-- Index 4: NVRAM -->
     <rom index="4"></rom>
     <nvram index="4" size="5"></nvram>
 
-    <!-- Index 5: MAME artwork, layout table (from default.lay) + PNGs from the artwork zip, as-is -->
-    <!-- OSD Artwork: View 1 = Upright Artwork, View 2 = Cocktail Artwork LAI -->
+    <!-- Index 5: Artwork -->
     <rom index="5" md5="none" zip="/mame-artwork/crush.zip">
         <part>
             41 57 02 00 04 00 20 01 E0 00 02 00 00 00 00 00 F2 02 94 03 BA 00 54 01 80 01 00 02 00 5B 03 00

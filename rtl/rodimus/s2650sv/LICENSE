@@ -1,0 +1,21 @@
+Copyright (C) 2026 Rodimus
+
+s2650sv: SystemVerilog Signetics 2650A / 2650B CPU, cycle-for-cycle re-implementation of sgs2650
+(SystemVerilog by Rodimus).
+
+Upstream attribution
+--------------------
+  sgs2650 (VHDL): "Signetics 2650A CPU", DO 4/2018, TEMlib (dev@temlib.org, Grabulosaure); the core in
+  MiSTer-devel/Arcadia_MiSTer (rtl/s2650/). Fleet copy (Galaxian / Pacman / Centipede / SpaceInvaders) adds two
+  fixes (fetch after an I/O access from IAR as a read; ZBRR / ZBSR indirect), reproduced here.
+
+  License: the sgs2650 sources carry NO licence text (only "Please send any bug report or remark to:
+  dev@temlib.org"). The terms of the upstream Arcadia_MiSTer repository apply to that code; they have not been
+  confirmed here. Until they are, treat s2650sv as carrying whatever terms sgs2650 / Arcadia_MiSTer carry.
+
+Attribution / licence notice
+----------------------------
+The attribution and licence terms in this file are our best reading of the upstream sources. Where an upstream gives
+no licence (or its terms are unclear), the code is offered under whatever terms that upstream carries. If anything
+here is wrong, incomplete or not what an author intended, please contact the maintainer (open an issue on this
+repository) and it will be corrected promptly.

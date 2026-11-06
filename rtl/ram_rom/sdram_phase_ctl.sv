@@ -1,22 +1,12 @@
-//============================================================================
-//
-//  sdram_phase_ctl.sv — steps the SDRAM_CLK PLL counter through sys/pll_cfg
-//  (dynamic phase shift). Runs on pll_cfg's mgmt clock (CLK_50M).
-//  Ported from Arcade-UPLFramebuffer (HW-confirmed 2026-10-13).
-//
-//  sel 0 = Auto: follow sdram_phase_cal's requests. sel 1-15 = fixed position
-//  (sel-1)*MAN_STEP. Position 0 is the PLL's built-in phase. ack_tgl flips once
-//  per finished request, moved or not.
-//
-//============================================================================
+//  Copyright (C) 2026 Rodimus
 
 module sdram_phase_ctl #(
-    parameter [4:0] CNT_SEL  = 5'd1,      // PLL C counter that drives SDRAM_CLK
-    parameter [6:0] MAN_STEP = 7'd5       // DPS steps per manual OSD entry
+    parameter [4:0] CNT_SEL  = 5'd1,
+    parameter [6:0] MAN_STEP = 7'd5
 )(
-    input             clk,                // pll_cfg mgmt clock
-    input       [3:0] sel,                // OSD, from another domain (quasi-static)
-    input       [6:0] cal_val,            // stable around cal_tgl
+    input             clk,
+    input       [3:0] sel,
+    input       [6:0] cal_val,
     input             cal_tgl,
     output reg        ack_tgl = 1'b0,
 
@@ -45,19 +35,19 @@ module sdram_phase_ctl #(
         sel_s1 <= sel;
         sel_s2 <= sel_s1;
         if (cfg_write) begin
-            if (!cfg_waitrequest) cfg_write <= 1'b0;   // held until accepted
+            if (!cfg_waitrequest) cfg_write <= 1'b0;
         end else begin
             case (st)
                 3'd0: if (!cfg_waitrequest && go) begin
                     if (is_auto) rq_pend <= 1'b0;
-                    if (want == cur) ack_tgl <= ~ack_tgl;   // already there: ack only
+                    if (want == cur) ack_tgl <= ~ack_tgl;
                     else begin
                         tgt <= want;
-                        cfg_address <= 6'd0; cfg_data <= 32'd0; cfg_write <= 1'b1;   // waitrequest mode
+                        cfg_address <= 6'd0; cfg_data <= 32'd0; cfg_write <= 1'b1;
                         st <= 3'd1;
                     end
                 end
-                3'd1: begin   // DPS: [15:0] shifts, [20:16] counter, [21] up
+                3'd1: begin
                     cfg_address <= 6'd6;
                     cfg_data    <= (tgt > cur) ? {10'd0, 1'b1, CNT_SEL, 9'd0, tgt - cur}
                                                : {10'd0, 1'b0, CNT_SEL, 9'd0, cur - tgt};
@@ -65,11 +55,11 @@ module sdram_phase_ctl #(
                     st <= 3'd2;
                 end
                 3'd2: begin
-                    cfg_address <= 6'd2; cfg_data <= 32'd0; cfg_write <= 1'b1;   // start
+                    cfg_address <= 6'd2; cfg_data <= 32'd0; cfg_write <= 1'b1;
                     dly <= 4'd0;
                     st <= 3'd3;
                 end
-                3'd3: begin   // give waitrequest time to rise before trusting it low
+                3'd3: begin
                     dly <= dly + 4'd1;
                     if (&dly) st <= 3'd4;
                 end

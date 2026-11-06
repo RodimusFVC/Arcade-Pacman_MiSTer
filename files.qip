@@ -1,11 +1,13 @@
 set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
 
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/chip_pool_pkg.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_pool_pkg.sv
 set_global_assignment -name SYSTEMVERILOG_FILE Arcade-Pacman.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/pacman_board.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/pacman_video.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/pacman_wsg.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/sound/schick_sound.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/pacman_dispatcher.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/boards/pacman/pacman_board.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/boards/pacman/pacman_video.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/boards/pacman/pacman_wsg.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/boards/schick/schick_sound.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/cpu/segacrypt/sega_315_5010.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/cpu/segacrypt/sega_315_5007.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/art/artwork.sv
@@ -13,23 +15,18 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/art/art_resample.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/art/png_decode.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/art/inflate.sv
 
-set_global_assignment -name QIP_FILE rtl/cpu/T80/T80.qip
-set_global_assignment -name VHDL_FILE rtl/cpu/s2650/base/base_pack.vhd
-set_global_assignment -name VHDL_FILE rtl/cpu/s2650/sgs2650_pack.vhd
-set_global_assignment -name VHDL_FILE rtl/cpu/s2650/sgs2650.vhd
-set_global_assignment -name VHDL_FILE rtl/cpu/s2650/s2650_cpu.vhd
-set_global_assignment -name QIP_FILE rtl/sound/v_sound.qip
-set_global_assignment -name QIP_FILE rtl/sound/jt89/syn/quartus/jt89_verilog.qip
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/rodimus/t80sv/t80sv_all.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/rodimus/s2650sv/s2650sv_all.sv
+set_global_assignment -name QIP_FILE rtl/sound/jt49/hdl/jt49.qip
+set_global_assignment -name VERILOG_FILE rtl/sound/jt49/hdl/filter/jt49_dcrm2.v
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/rodimus/sn76489sv/sn76489sv.sv
 
 set_global_assignment -name VERILOG_FILE rtl/mister_custom/pause.v
 set_global_assignment -name VERILOG_FILE rtl/mister_custom/hiscore.v
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/mister_custom/controllers.sv
 
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/rom_loader.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/pacman_sdrom.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/sdram_rom.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/sdram_phase_cal.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/sdram_phase_ctl.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/sdram.sv
-# DPRAMSV-2026-10-25: VHDL dpram_dc replaced by the SystemVerilog one (same ports/generics + byteena); original:
-# set_global_assignment -name VHDL_FILE rtl/ram_rom/dpram_dc.vhd
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram_rom/dpram_dc.sv

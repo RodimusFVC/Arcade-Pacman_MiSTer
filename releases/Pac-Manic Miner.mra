@@ -25,14 +25,14 @@
     <joystick>4-way</joystick>
     <special_controls></special_controls>
     <num_buttons>1</num_buttons>
-    <buttons names="Jump,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used" default="A,B,X,Y,Select,Start,R,L"/>
+    <buttons names="Jump,-,-,-,Coin,Start 1P,Start 2P,Pause,-,-" default="A,Select,Start,R,L"/>
 
     <switches default="FF,FF,FF,FF">
         <dip name="Music" bits="8" ids="Off,On"/>
         <dip name="FX" bits="11" ids="Off,On"/>
     </switches>
 
-    <!-- Index 0: CPU 0x0000 (ROM at 0000-3FFF and 8000-BFFF), gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <!-- Index 0: ROM -->
     <rom index="0" md5="none">
         <part>
             C3 01 01 00 00 00 00 00 77 23 10 FC C9 00 00 00
@@ -2644,7 +2644,7 @@
         </part>
     </rom>
 
-    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <!-- Index 1: Config -->
     <rom index="1">
         <part>
             04 91 00 00 00 00 00 00 00 00 00 00 00 00 00 00

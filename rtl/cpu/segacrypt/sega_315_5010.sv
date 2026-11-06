@@ -2,8 +2,8 @@
 //
 //  Sega 315-5010 encrypted Z80 (Pengo) - opcode/data decryption
 //
-//  Port of MAME src/devices/machine/segacrpt_device.cpp (BSD-3-Clause;
-//  Nicola Salmoria, David Haywood). Only D3/D5/D7 of 0000-7FFF change.
+// Based on MAME segacrpt_device.cpp (Nicola Salmoria, David Haywood, BSD-3-Clause)
+// Only D3/D5/D7 of 0000-7FFF change.
 //
 //    row = {A12,A8,A4,A0}                 (table pair select)
 //    col = {D5,D3}, mirrored when D7 set  (entry within the pair)

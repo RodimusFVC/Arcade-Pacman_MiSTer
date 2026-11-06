@@ -25,7 +25,7 @@
     <joystick>4-way</joystick>
     <special_controls></special_controls>
     <num_buttons>1</num_buttons>
-    <buttons names="Fire,Not Used,Not Used,Not Used,Coin,Start 1P,Start 2P,Pause,Not Used,Not Used,Not Used" default="A,B,X,Y,Select,Start,R,L"/>
+    <buttons names="Fire,-,-,-,Coin,Start 1P,Start 2P,Pause,-,-,-" default="A,Select,Start,R,L"/>
 
     <switches default="FF,FF,FF,00">
         <dip name="Cabinet" bits="16" ids="Upright,Cocktail" values="1,0"/>
@@ -36,7 +36,7 @@
         <dip name="Invulnerability (Cheat)" bits="24" ids="Off,On"/>
     </switches>
 
-    <!-- Index 0: CPU 0x0000, gfx 0x10000, PROMs 0x14000, waveform PROM 0x14800 -->
+    <!-- Index 0: ROM -->
     <rom index="0" md5="none" zip="dremshpr.zip">
         <part crc="830c6361" name="red_1.50"/>
         <part crc="d22551cc" name="red_2.51"/>
@@ -54,7 +54,7 @@
         <part crc="39d6fb5c" name="6301-1.37"/>
     </rom>
 
-    <!-- Index 1: board variant, flags, input map (see Arcade-Pacman.sv) -->
+    <!-- Index 1: Config -->
     <rom index="1">
         <part>
             12 13 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -63,7 +63,7 @@
         </part>
     </rom>
 
-    <!-- Index 3: hiscore config (MAME hiscore.dat), index 4: saved scores -->
+    <!-- Index 3: Hiscore -->
     <rom index="3" md5="none">
         <part>
             00 62 FE 5A 00 FF 00 02 00 02 00 01 11 11 00 00
@@ -72,6 +72,7 @@
             00 00 48 09 00 01 03 03
         </part>
     </rom>
+    <!-- Index 4: NVRAM -->
     <rom index="4"></rom>
     <nvram index="4" size="247"></nvram>
 

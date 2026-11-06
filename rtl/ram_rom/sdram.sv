@@ -25,6 +25,8 @@
 //
 // furrtek 2019-01-24 : Added ugly burst reading
 // Sorgelig 2019-08   : rework, support mem copy and larger chips.
+// Rodimus 2026-10-30 : sdram_startup_cycles / cycles_per_refresh are parameters (defaults unchanged),
+//                      so a core can clock the controller below 100 MHz without a clock crossing.
 //
 
 module sdram
@@ -78,10 +80,6 @@ localparam OP_MODE             = 2'b00;    // only 00 (standard operation) allow
 localparam NO_WRITE_BURST      = 1'b1;     // 0= write burst enabled, 1=only single access write
 localparam MODE                = {3'b000, NO_WRITE_BURST, OP_MODE, CAS_LATENCY, ACCESS_TYPE, BURST_CODE};
 
-// UPL: these two are the only clock-rate-dependent constants; they were localparams
-// calibrated for 100 MHz. Made parameters so this core can drive the controller from
-// its 60 MHz fabric clock without a clock-domain crossing. Defaults are unchanged, so
-// an instantiation that omits them behaves exactly as the stock NeoGeo/DECOCassette one.
 parameter  sdram_startup_cycles= 14'd12100;// 100us, plus a little more, @ 100MHz
 parameter  cycles_per_refresh  = 14'd780;  // (64000*100)/8192-1 Calc'd as (64ms @ 100MHz)/8192 rose
 localparam startup_refresh_max = 14'b11111111111111;
